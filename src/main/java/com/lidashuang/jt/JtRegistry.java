@@ -20,8 +20,8 @@ public final class JtRegistry {
     private static final Map<Integer, JtActuator> ACTUATOR_CORE = new Hashtable<>();
 
     /** 处理线程池 */
-    private static ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(0,
-            Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(), new DefaultThreadFactory());
+    private static ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(5,
+            20, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(), new DefaultThreadFactory());
 
     static {
         /* 设置默认的消息核心 */
