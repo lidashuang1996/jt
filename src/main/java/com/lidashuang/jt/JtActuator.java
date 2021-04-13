@@ -3,11 +3,17 @@ package com.lidashuang.jt;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
+ * 处理器
  * @author lidashuang
  * @version 1.0
  */
 public interface JtActuator {
 
-    public void execute(ChannelHandlerContext context, JtMessage message) throws Exception;
+    /**
+     * 收到消息后执行的方法
+     * @param context Netty 上下文对象
+     * @param message Jt 消息对象
+     */
+    public void execute(ChannelHandlerContext context, JtMessage message);
 
 }

@@ -267,7 +267,7 @@ public class JtDecoder extends ByteToMessageDecoder {
         // 校验码是否正确
         if (checkStatus) {
             // 获取类型
-            final int type = Utils.bytesToHigh8Low8(Utils.bytesArrayIntercept(data, 0, 2));
+            final int type = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(data, 0, 2));
             LOGGER.error("JT 消息类型 ==> " + type);
             return JtRegistry.getMessageCore(type).decode();
         } else {

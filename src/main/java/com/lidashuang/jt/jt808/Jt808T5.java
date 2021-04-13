@@ -1,7 +1,7 @@
 package com.lidashuang.jt.jt808;
 
 import com.lidashuang.jt.JtMessage;
-import com.lidashuang.jt.Utils;
+import com.lidashuang.jt.JtUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -59,13 +59,13 @@ public class Jt808T5 extends JtMessage {
         final byte[] content = new byte[contentLength];
         System.arraycopy(bytes, headMessage.getHeadLength(), content, 0, contentLength);
         try {
-            this.province = Utils.bytesToHigh8Low8(Utils.bytesArrayIntercept(content, 0, 2));
-            this.city = Utils.bytesToHigh8Low8(Utils.bytesArrayIntercept(content, 2, 2));
-            this.manufacturer = Utils.bytesToHex(Utils.bytesArrayIntercept(content, 4, 5));
-            this.terminalModel = Utils.bytesToHex(Utils.bytesArrayIntercept(content, 9, 20));
-            this.terminalId = new String(Utils.bytesArrayIntercept(content, 29, 7));
+            this.province = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(content, 0, 2));
+            this.city = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(content, 2, 2));
+            this.manufacturer = JtUtils.bytesToHex(JtUtils.bytesArrayIntercept(content, 4, 5));
+            this.terminalModel = JtUtils.bytesToHex(JtUtils.bytesArrayIntercept(content, 9, 20));
+            this.terminalId = new String(JtUtils.bytesArrayIntercept(content, 29, 7));
             this.licensePlateColor = content[36];
-            this.vehicleMark = new String(Utils.bytesArrayIntercept(content, 37, content.length - 37), "GBK");
+            this.vehicleMark = new String(JtUtils.bytesArrayIntercept(content, 37, content.length - 37), "GBK");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }

@@ -1,7 +1,7 @@
 package com.lidashuang.jt.jt808;
 
 import com.lidashuang.jt.JtMessage;
-import com.lidashuang.jt.Utils;
+import com.lidashuang.jt.JtUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class Jt808T6 extends JtMessage {
         ByteArrayOutputStream outputStream = null;
         try {
             outputStream = new ByteArrayOutputStream();
-            outputStream.write(Utils.integerToHigh8Low8(number));
+            outputStream.write(JtUtils.integerToHigh8Low8(number));
             outputStream.write(result);
             outputStream.write(authCode.getBytes("GBK"));
             final byte[] content = outputStream.toByteArray();

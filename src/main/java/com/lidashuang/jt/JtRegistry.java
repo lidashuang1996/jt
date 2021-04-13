@@ -13,6 +13,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class JtRegistry {
 
+    public static final String SYNC = "SYNC";
+    public static final String ASYNC = "ASYNC";
+
+    /** sync async // 同步 异步 */
+    private static String MODE = SYNC;
+
     /** 消息核心 */
     private static final Map<Integer, JtMessage> MESSAGE_CORE = new Hashtable<>();
 
@@ -87,6 +93,7 @@ public final class JtRegistry {
     public static void shutdownThreadPool() {
         if (THREAD_POOL != null) {
             THREAD_POOL.shutdown();
+            THREAD_POOL = null;
         }
     }
 
@@ -99,6 +106,30 @@ public final class JtRegistry {
         } else {
             THREAD_POOL.execute(runnable);
         }
+    }
+
+    /**
+     * 设置同步还是异步执行
+     * @param mode 方式
+     */
+    public static void setMode(String mode) {
+        if (mode != null) {
+            MODE = ASYNC.equals(mode.toUpperCase()) ? ASYNC : SYNC;
+            if (SYNC.equals(MODE)) {
+                shutdownThreadPool();
+            } else {
+                THREAD_POOL = new ThreadPoolExecutor(5,
+                        20, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(), new DefaultThreadFactory());
+            }
+        }
+    }
+
+    /**
+     * 获取方式
+     * @return 同步还是异步执行的方式
+     */
+    public static String getMode() {
+        return MODE;
     }
 
     /**

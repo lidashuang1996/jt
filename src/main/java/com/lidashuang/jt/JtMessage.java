@@ -74,20 +74,20 @@ public abstract class JtMessage  {
             ByteArrayOutputStream outputStream = null;
             try {
                 outputStream = new ByteArrayOutputStream();
-                outputStream.write(Utils.integerToHigh8Low8(this.id));
+                outputStream.write(JtUtils.integerToHigh8Low8(this.id));
 
                 final String attribute = "00" + (subcontract ? 1 : 0)
-                        + Utils.integerToBinaryString(encryption, 3)
-                        + Utils.integerToBinaryString(contentLength, 10);
+                        + JtUtils.integerToBinaryString(encryption, 3)
+                        + JtUtils.integerToBinaryString(contentLength, 10);
 
-                outputStream.write(Utils.binaryToByte(attribute.substring(0, 8)));
-                outputStream.write(Utils.binaryToByte(attribute.substring(8, 16)));
+                outputStream.write(JtUtils.binaryToByte(attribute.substring(0, 8)));
+                outputStream.write(JtUtils.binaryToByte(attribute.substring(8, 16)));
 
-                outputStream.write(Utils.codeTo8421Bytes(this.phone));
-                outputStream.write(Utils.integerToHigh8Low8(this.number));
+                outputStream.write(JtUtils.codeTo8421Bytes(this.phone));
+                outputStream.write(JtUtils.integerToHigh8Low8(this.number));
                 if (subcontract) {
-                    outputStream.write(Utils.integerToHigh8Low8(this.subcontractLength));
-                    outputStream.write(Utils.integerToHigh8Low8(this.subcontractIndex));
+                    outputStream.write(JtUtils.integerToHigh8Low8(this.subcontractLength));
+                    outputStream.write(JtUtils.integerToHigh8Low8(this.subcontractIndex));
                 }
                 return outputStream.toByteArray();
             } catch (Exception e) {
@@ -150,6 +150,10 @@ public abstract class JtMessage  {
         this.decode();
     }
 
+    public int getType() {
+        return 0;
+    }
+
     /**
      * 解码为 [消息头 + 消息内容]
      */
@@ -165,20 +169,20 @@ public abstract class JtMessage  {
         if (bytes.length >= 12) {
             final int encryption = bytes[2] >> 2 & 0x07;
             final boolean subcontract = (bytes[2] >> 5 & 0x01) == 1;
-            final String phone = Utils.byteTo8421Code(bytes[4])
-                    + Utils.byteTo8421Code(bytes[5])
-                    + Utils.byteTo8421Code(bytes[6])
-                    + Utils.byteTo8421Code(bytes[7])
-                    + Utils.byteTo8421Code(bytes[8])
-                    + Utils.byteTo8421Code(bytes[9]);
+            final String phone = JtUtils.byteTo8421Code(bytes[4])
+                    + JtUtils.byteTo8421Code(bytes[5])
+                    + JtUtils.byteTo8421Code(bytes[6])
+                    + JtUtils.byteTo8421Code(bytes[7])
+                    + JtUtils.byteTo8421Code(bytes[8])
+                    + JtUtils.byteTo8421Code(bytes[9]);
             final int headLength = (subcontract ? 16 : 12);
-            final int contentLength = Utils.bytesToHigh8Low8(new byte[] {(byte) (bytes[2] & 0x01), bytes[3] });
+            final int contentLength = JtUtils.bytesToHigh8Low8(new byte[] {(byte) (bytes[2] & 0x01), bytes[3] });
             int subcontractIndex = 0;
             int subcontractLength = 0;
             if (subcontract) {
                 if (bytes.length >= 16) {
-                    subcontractIndex = Utils.bytesToHigh8Low8(new byte[] { bytes[14], bytes[15] });
-                    subcontractLength = Utils.bytesToHigh8Low8(new byte[] { bytes[12], bytes[13] });
+                    subcontractIndex = JtUtils.bytesToHigh8Low8(new byte[] { bytes[14], bytes[15] });
+                    subcontractLength = JtUtils.bytesToHigh8Low8(new byte[] { bytes[12], bytes[13] });
                 } else {
                     throw new RuntimeException("header decode 失败！");
                 }
@@ -189,13 +193,13 @@ public abstract class JtMessage  {
             }
 
             return new HeadMessage(
-                    Utils.bytesToHigh8Low8(new byte[] { bytes[0], bytes[1] }),
+                    JtUtils.bytesToHigh8Low8(new byte[] { bytes[0], bytes[1] }),
                     headLength,
                     contentLength,
                     encryption,
                     subcontract,
                     phone,
-                    Utils.bytesToHigh8Low8(new byte[] { bytes[10], bytes[11] }),
+                    JtUtils.bytesToHigh8Low8(new byte[] { bytes[10], bytes[11] }),
                     subcontractLength,
                     subcontractIndex
             );
