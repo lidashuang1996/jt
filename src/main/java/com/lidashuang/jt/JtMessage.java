@@ -153,7 +153,7 @@ public abstract class JtMessage  {
     /**
      * 解码为 [消息头 + 消息内容]
      */
-    public abstract void decode();
+    public abstract JtMessage decode();
 
     /**
      * 编码内容

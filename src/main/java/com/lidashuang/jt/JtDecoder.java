@@ -1,11 +1,13 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.jt808.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -119,17 +121,20 @@ import java.util.List;
  */
 public class JtDecoder extends ByteToMessageDecoder {
 
-    /***/
+    /** 标记字符 */
     private static final byte MARK = 0x7e;
+    /** 转义字符 */
     private static final byte MARK_T = 0x7d;
-
-    /***/
+    /** 转义字符 模型1*/
     private static final byte MARK_T_B1 = 0x02;
-    /***/
+    /** 转义字符 模型2*/
     private static final byte MARK_T_B2 = 0x01;
+    /** 日志对象 */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JtDecoder.class);
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
+    protected void decode(ChannelHandlerContext channelHandlerContext,
+                          ByteBuf byteBuf, List<Object> list) throws Exception {
         // 读取数据流
         final byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
@@ -137,109 +142,137 @@ public class JtDecoder extends ByteToMessageDecoder {
         list.addAll(jtDecode(bytes));
     }
 
+    /**
+     * JT 解码/拆包操作
+     * @param bytes 数据字节码
+     * @return 解析的消息对象
+     * @throws Exception 解析出现的异常
+     */
     private static List<JtMessage> jtDecode(byte[] bytes) throws Exception {
+        // 创建返回的集合对象
         final List<JtMessage> result = new ArrayList<>();
+        // 验证一下参数
+        if (bytes == null || bytes.length == 0) {
+            // 抛出异常 @0 用来快速定位
+            LOGGER.error("JT 消息内容为空 ～ @0");
+            throw new Exception("JT 消息解码异常～ @0");
+        }
         // 采用 0x7e 表示，若校验码、消息头以及消息体中出现 0x7e，则要进行转义处理
         // 标识位 | 消息头 | 消息体 | 检验码 | 标识位
-
         // 当前索引
         int index = 0;
+        // 判断是否是 MARK 记号开头
         if (bytes[index] == MARK) {
-            List<Byte> data = new ArrayList<>();
-            data.add(MARK);
+            // 循环读取数据，找到结尾的标记符号
             for (int i = 1; i < bytes.length; i++) {
-                data.add(bytes[i]);
                 if (bytes[i] == MARK) {
-                    System.out.println("bb -> " + data);
+                    // 对单条消息进行解码，且返回
+                    final int dLength = i - index + 1;
+                    final byte[] data = new byte[dLength];
+                    System.arraycopy(bytes, index, data, 0, dLength);
                     result.add(jtDecodeByteToMessage(data));
-                    // 当前不是最后一个位置，说明存在多条消息
-                    if (i < bytes.length - 1) {
+                    // 判断一下当前是不收最后一个位置，如果当前不是最后一个位置，说明存在多条消息
+                    if (i + 1 < bytes.length) {
+                        // 判断一下，下一位是否是 MARK 记号开头
                         if (bytes[i + 1] == MARK) {
+                            // i 变大一次 且 更新索引
                             index = ++i;
-                            data = new ArrayList<>();
-                            data.add(MARK);
                         } else {
-                            throw new Exception("JT 消息解码异常～@3");
+                            LOGGER.error("JT 消息拆包出现异常 ～ @3");
+                            throw new Exception("JT 消息解码异常 ～ @3");
                         }
                     } else {
                         index = i;
                     }
                 }
             }
+            // 消息读取完成，索引指向的下标为数组的最后一位
+            // 否者说明最后一位不是 MARK 标记的，该消息为异常消息
             if (index + 1 != bytes.length) {
-                throw new Exception("JT 消息解码异常～@2");
+                LOGGER.error("JT 消息结尾标记异常 ～ @2");
+                throw new Exception("JT 消息解码异常 ～ @2");
             }
         } else {
-            throw new Exception("JT 消息解码异常～@1");
+            // 抛出异常 @1 用来快速定位
+            LOGGER.error("JT 消息头不是以 [ " + MARK + " ] 开头 ～ @1");
+            throw new Exception("JT 消息解码异常 ～ @1");
         }
         return result;
     }
 
-    private static JtMessage jtDecodeByteToMessage(List<Byte> bytes) throws Exception {
+    /**
+     * 单条消息解析
+     * @param bytes 单条消息的字节码
+     * @return 解析后的对象
+     * @throws Exception 解析过程出现的异常
+     */
+    private static JtMessage jtDecodeByteToMessage(byte[] bytes) throws Exception {
         // * 规则定义如下：
-        // * 0x7e <————> 0x7d 后紧跟一个 0x02；
-        // * 0x7d <————> 0x7d 后紧跟一个 0x01。
-        // * 接收消息时：转义还原——>验证校验码——>解析消息。
+        // * 0x7e <————> 0x7d 后紧跟一个 0x02
+        // * 0x7d <————> 0x7d 后紧跟一个 0x01
+        // * 接收消息时：转义还原——>验证校验码——>解析消息
 
         // * 示例：
         // * 发送一包内容为 0x30 0x7e 0x08 0x7d 0x55 的数据包，
         // * 则经过封装如下：0x7e 0x30 0x7d 0x02 0x08 0x7d 0x01 0x55 0x7e
 
-        final int minLen = 4;
-        int len = bytes.size();
+        // 开始的长度
+        final int sLen = 1;
+        // 结尾的长度
+        final int eLen = 2;
+        // 单条消息的最小长度 1 标记 + 12 消息头<12/16> + 1 校验 + 1 标记
+        final int minLen = sLen + 12 + eLen;
 
-        if (len < minLen) {
-            throw new Exception("JT 消息长度出现异常");
+        // 最短长度校验
+        if (bytes.length < minLen) {
+            LOGGER.error("JT 消息转对象长度出现异常 ～");
+            throw new Exception("JT 消息转对象长度出现异常 ～");
         }
 
-        Integer verificationCode = null;
-        boolean isVerificationPass = false;
-
-        for (int i = 0; i < len; i++) {
+        // 索引
+        int index = 0;
+        // 校验码
+        int checkCode = bytes[sLen];
+        // 校验的状态
+        boolean checkStatus;
+        // 数据源
+        byte[] data = new byte[bytes.length - sLen - eLen];
+        // 转义还原 且 计算校验码
+        for (int i = sLen; i < bytes.length - eLen; i++) {
             // 转义还原
-            if (bytes.get(i) == MARK_T && i > 0 && i + 1 < bytes.size()) {
-                if (bytes.get(i + 1) == MARK_T_B1) {
-                    bytes.set(i, MARK);
-                    bytes.remove(i + 1);
-                    len--;
-                } else if (bytes.get(i + 1) == MARK_T_B2) {
-                    bytes.set(i, MARK_T);
-                    bytes.remove(i + 1);
-                    len--;
+            if (bytes[i] == MARK_T && i + 1 < bytes.length - eLen) {
+                if (bytes[i + 1] == MARK_T_B1) {
+                    data[index++] = MARK;
+                    i++;
+                } else if (bytes[i + 1] == MARK_T_B2) {
+                    data[index++] = MARK_T;
+                    i++;
+                } else {
+                    data[index++] = bytes[i];
                 }
+            } else {
+                data[index++] = bytes[i];
             }
-            // 验证校验码
-            if (i == 1) {
-                verificationCode = (int) bytes.get(i);
-            } else if (i == bytes.size() - 2) {
-                isVerificationPass = verificationCode != null && verificationCode == (int) bytes.get(bytes.size() - 2);
-            } else if (verificationCode != null && i < bytes.size() - 2) {
-                verificationCode = verificationCode ^ bytes.get(i);
+            // 计算校验码
+            if (i != sLen) {
+                checkCode ^= data[index - 1];
             }
         }
-        if (isVerificationPass) {
+        // 压缩数组
+        if (index != bytes.length - sLen - eLen) {
+            data = Arrays.copyOf(data, index);
+        }
+        // 校验码验证
+        checkStatus = (checkCode == bytes[bytes.length - eLen]);
+        // 校验码是否正确
+        if (checkStatus) {
             // 获取类型
-            final int type = Utils.bytesToHigh8Low8(new byte[] { bytes.get(1),  bytes.get(2) });
-            System.out.println("type--> " + type);
-            // 删除前面后面的数据
-            bytes.remove(0);
-            bytes.remove(bytes.size() - 1);
-            bytes.remove(bytes.size() - 1);
-            switch (type) {
-                // 终端注册 --> 终端注册应答<8.6 终端注册应答>
-                case Jt808T5.M_ID:
-                    return new Jt808T5(Utils.byteListToByteArray(bytes));
-                // 终端注销
-                case Jt808T7.M_ID:
-                    return new Jt808T7(Utils.byteListToByteArray(bytes));
-                // 终端鉴权(重新连接后发送的鉴权消息)
-                case Jt808T8.M_ID:
-                    return new Jt808T8(Utils.byteListToByteArray(bytes));
-                default:
-                    return new Jt808T0(Utils.byteListToByteArray(bytes));
-            }
+            final int type = Utils.bytesToHigh8Low8(Utils.bytesArrayIntercept(data, 0, 2));
+            LOGGER.error("JT 消息类型 ==> " + type);
+            return JtRegistry.getMessageCore(type).decode();
         } else {
-            throw new Exception("JT 消息验证码异常");
+            LOGGER.error("JT 消息校验码异常 ～ ");
+            throw new Exception("JT 消息校验码异常 ～");
         }
     }
 }

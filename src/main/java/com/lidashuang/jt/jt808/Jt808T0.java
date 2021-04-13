@@ -14,6 +14,9 @@ public class Jt808T0 extends JtMessage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Jt808T0.class);
 
+    public Jt808T0() {
+    }
+
     public Jt808T0(byte[] bytes) {
         this.bytes = bytes;
     }

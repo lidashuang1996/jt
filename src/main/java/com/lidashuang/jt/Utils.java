@@ -128,7 +128,7 @@ public final class Utils {
 
     public static byte[] bytesArrayIntercept(byte[] bytes, int index, int len) {
         final byte[] result = new byte[len];
-        System.arraycopy(bytes, index, result, 0, index + len - index);
+        System.arraycopy(bytes, index, result, 0, len);
         return result;
     }
 
