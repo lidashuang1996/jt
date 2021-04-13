@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
+ * 注册中心
  * @author lidashuang
  * @version 1.0
  */

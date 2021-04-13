@@ -1,10 +1,13 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.jt808.Jt808T6;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -118,49 +121,55 @@ import java.util.Arrays;
  */
 public class JtEncoder extends MessageToByteEncoder<JtMessage> {
 
+    /** 标记字符 */
     private static final byte MARK = 0x7e;
+    /** 转义字符 */
     private static final byte MARK_T = 0x7d;
-
+    /** 转义字符 模型1*/
     private static final byte MARK_T_B1 = 0x02;
+    /** 转义字符 模型2*/
     private static final byte MARK_T_B2 = 0x01;
+    /** 日志对象 */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JtEncoder.class);
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext,
-                          JtMessage jtMessage, ByteBuf byteBuf) {
-        byte[] data = jtMessage.encode();
-        System.out.println("推送的内容为： " + Arrays.toString(data));
-
-//        // 获取验证码
-//        int verificationCode = data[0];
-//        for (int i = 1; i < data.length; i++) {
-//            // 验证校验码
-//            verificationCode = verificationCode ^ data[i];
-//        }
-//
-//        // 转义操作
-//        for (int i = 0; i < data.length; i++) {
-//            if (data[i] == MARK) {
-//                data = Arrays.copyOf(data, data.length + 1);
-//                data[i] = MARK_T;
-//                System.arraycopy(data, i + 1, data, i + 2, data.length - i - 1);
-//                data[i + 1] = MARK_T_B1;
-//            } else if (data[i] == MARK_T) {
-//                data = Arrays.copyOf(data, data.length + 1);
-//                data[i] = MARK_T;
-//                System.arraycopy(data, i + 1, data, i + 2, data.length - i - 1);
-//                data[i + 1] = MARK_T_B2;
-//            }
-//        }
-//
-//        // 包装一下
-//        data = Arrays.copyOf(data, data.length + 3);
-//        System.arraycopy(data, 0, data, 1, data.length - 3);
-//        data[0] = MARK;
-//        data[data.length - 1] = MARK;
-//        data[data.length - 2] = (byte) verificationCode;
-//
+    protected void encode(ChannelHandlerContext channelHandlerContext, JtMessage jtMessage, ByteBuf byteBuf) {
+        // 输出的结果
+        byte[] result = new byte[0];
+        // 消息编码得到原本数据
+        final byte[] data = jtMessage.encode();
+        LOGGER.info("推送的源数据内容为 ==> " + Arrays.toString(data));
+        // 校验码
+        Integer checkCode = null;
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            outputStream.write(MARK);
+            for (final byte datum : data) {
+                checkCode = checkCode == null ? datum : (checkCode ^ datum);
+                if (datum == MARK) {
+                    outputStream.write(MARK_T);
+                    outputStream.write(MARK_T_B1);
+                } else if (datum == MARK_T) {
+                    outputStream.write(MARK_T);
+                    outputStream.write(MARK_T_B2);
+                } else {
+                    outputStream.write(checkCode);
+                }
+            }
+            outputStream.write(MARK);
+            outputStream.flush();
+            result = outputStream.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         // 推送数据
-        System.out.println("推送的消息为： " + Arrays.toString(data));
-        byteBuf.writeBytes(data);
+        LOGGER.info("推送的最终数据内容为： " + Arrays.toString(result));
+        byteBuf.writeBytes(result);
     }
 }
