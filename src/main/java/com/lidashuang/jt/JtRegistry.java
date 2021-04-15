@@ -33,7 +33,7 @@ public final class JtRegistry {
         /* 设置默认的消息核心 */
         MESSAGE_CORE.put(null, new Jt808T0());
         /* 设置默认的处理器核心 */
-        ACTUATOR_CORE.put(null, (context, message) -> System.out.println(message));
+        ACTUATOR_CORE.put(null, new JtGlobalDefaultActuator());
     }
 
     /**
