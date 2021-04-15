@@ -23,10 +23,10 @@ public class JtHandler extends ChannelInboundHandlerAdapter {
             if (jtActuator != null) {
                 if (JtRegistry.ASYNC.equals(JtRegistry.getMode())) {
                     // 线程池中执行
-                    JtRegistry.executeThreadPool(() -> jtActuator.execute(context, jtMessage));
+                    JtRegistry.executeThreadPool(() -> jtActuator.execute(new JtContext(context), jtMessage));
                 } else {
                     // 立即执行
-                    jtActuator.execute(context, jtMessage);
+                    jtActuator.execute(new JtContext(context), jtMessage);
                 }
             }
         }
