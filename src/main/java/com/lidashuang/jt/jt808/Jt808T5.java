@@ -27,52 +27,62 @@ import java.util.Arrays;
  *
  */
 public class Jt808T5 extends JtMessage {
+
     /** 消息 ID：0x0100 */
     public static final int M_ID = 0x0100;
-    public static final int M_LEN = 37;
 
     private int province;
     private int city;
-
     private String manufacturer;
     private String terminalModel;
     private String terminalId;
-
     private int licensePlateColor;
     private String vehicleMark;
 
-
     public Jt808T5(byte[] bytes) {
-        super(bytes);
-        if (bytes != null) {
-            System.out.println("终端注册 Jt808T5 头部 ===> " + getHeadMessage());
-            System.out.println("终端注册 Jt808T5 内容 ===> " + Arrays.toString(bytes));
-            System.out.println("终端注册 Jt808T5 数据 ===> " + this.toString());
-        } else {
-            throw new RuntimeException("数据格式 --> 终端注册 Jt808T5 --> 长度出现问题！");
-        }
+        this.bytes = bytes;
+        this.header = new Header(this.bytes);
+    }
+
+    public Jt808T5(int province, int city, String manufacturer, String terminalModel,
+                   String terminalId, int licensePlateColor, String vehicleMark) {
+        this.province = province;
+        this.city = city;
+        this.manufacturer = manufacturer;
+        this.terminalModel = terminalModel;
+        this.terminalId = terminalId;
+        this.licensePlateColor = licensePlateColor;
+        this.vehicleMark = vehicleMark;
     }
 
     @Override
-    public void decode() {
-        final int contentLength = headMessage.getContentLength();
-        final byte[] content = new byte[contentLength];
-        System.arraycopy(bytes, headMessage.getHeadLength(), content, 0, contentLength);
+    public int getType() {
+        return M_ID;
+    }
+
+    @Override
+    public JtMessage decode() {
         try {
+            final int contentLength = this.header.getContentLength();
+            final byte[] content = new byte[contentLength];
+            System.arraycopy(bytes, this.header.getHeadLength(), content, 0, contentLength);
             this.province = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(content, 0, 2));
             this.city = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(content, 2, 2));
             this.manufacturer = JtUtils.bytesToHex(JtUtils.bytesArrayIntercept(content, 4, 5));
             this.terminalModel = JtUtils.bytesToHex(JtUtils.bytesArrayIntercept(content, 9, 20));
             this.terminalId = new String(JtUtils.bytesArrayIntercept(content, 29, 7));
             this.licensePlateColor = content[36];
-            this.vehicleMark = new String(JtUtils.bytesArrayIntercept(content, 37, content.length - 37), "GBK");
-        } catch (UnsupportedEncodingException e) {
+            this.vehicleMark = new String(JtUtils.bytesArrayIntercept(content, 37, contentLength - 37), "GBK");
+        } catch (Exception e) {
+            // 抛出异常，终止执行
             throw new RuntimeException(e);
         }
+        return this;
     }
 
     @Override
     public byte[] encode() {
+        // 以后处理 客户端需要
         return new byte[0];
     }
 
@@ -93,6 +103,10 @@ public class Jt808T5 extends JtMessage {
                 + licensePlateColor
                 + ",\"vehicleMark\":\""
                 + vehicleMark + '\"'
+                + ",\"bytes\":"
+                + Arrays.toString(bytes)
+                + ",\"header\":"
+                + header
                 + "}";
     }
 }

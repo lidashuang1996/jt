@@ -19,29 +19,10 @@ import lombok.Getter;
  *
  *
  */
-public class Jt808T2 extends JtMessage {
+public class Jt808T2  {
     /** 消息 ID：0x8001 */
     public static final int M_ID = 0x8001;
     public static final int M_LEN = 5;
 
-    /**
-     * 构造输入消息源字节码数据
-     *
-     * @param bytes 消息源字节码数据
-     */
-    public Jt808T2(byte[] bytes) {
-        super(bytes);
-    }
-
-
-    @Override
-    public void decode() {
-
-    }
-
-    @Override
-    public byte[] encode() {
-        return new byte[0];
-    }
 
 }

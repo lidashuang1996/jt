@@ -16,22 +16,10 @@ import com.lidashuang.jt.JtMessage;
  *
  *
  */
-public class Jt808T1 extends JtMessage {
+public class Jt808T1  {
     /** 消息 ID：0x0001 */
     public static final int M_ID = 0x0001;
     public static final int M_LEN = 5;
 
-    public Jt808T1(byte[] bytes) {
-        super(bytes);
-    }
 
-    @Override
-    public void decode() {
-
-    }
-
-    @Override
-    public byte[] encode() {
-        return new byte[0];
-    }
 }

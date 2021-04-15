@@ -15,6 +15,12 @@ public abstract class JtMessage  {
     /** 日志对象 */
     protected static final Logger LOGGER = LoggerFactory.getLogger(JtMessage.class);
 
+    /** 最大消息长度 */
+    protected static final int MAX_MESSAGE_CONTENT_LENGTH = 1024;
+
+    /** 默认的消息长度 */
+    protected static final String DEFAULT_MESSAGE_PHONE = "000000000000";
+
     /** 消息源字节码数据 */
     protected byte[] bytes;
 

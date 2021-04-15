@@ -21,27 +21,31 @@ public class Jt808T8 extends JtMessage {
 
     private String authCode;
 
+    public Jt808T8(String authCode) {
+        this.authCode = authCode;
+    }
+
     public Jt808T8(byte[] bytes) {
-        super(bytes);
-        if (bytes != null) {
-            System.out.println("终端注册 Jt808T8 头部 ===> " + getHeadMessage());
-            System.out.println("终端注册 Jt808T8 内容 ===> " + Arrays.toString(bytes));
-            System.out.println("终端注册 Jt808T8 数据 ===> " + this.toString());
-        } else {
-            throw new RuntimeException("数据格式 --> 终端鉴权 Jt808T8 --> 长度出现问题！");
-        }
+        this.bytes = bytes;
+        this.header = new Header(this.bytes);
     }
 
     @Override
-    public void decode() {
-        final int contentLength = headMessage.getContentLength();
-        final byte[] content = new byte[contentLength];
-        System.arraycopy(bytes, headMessage.getHeadLength(), content, 0, contentLength);
+    public JtMessage decode() {
         try {
+            final int contentLength = this.header.getContentLength();
+            final byte[] content = new byte[contentLength];
+            System.arraycopy(this.bytes, this.header.getHeadLength(), content, 0, contentLength);
             this.authCode = new String(content, "GBK");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+        return this;
+    }
+
+    @Override
+    public int getType() {
+        return M_ID;
     }
 
     @Override
@@ -54,6 +58,10 @@ public class Jt808T8 extends JtMessage {
         return "{"
                 + "\"authCode\":\""
                 + authCode + '\"'
+                + ",\"bytes\":"
+                + Arrays.toString(bytes)
+                + ",\"header\":"
+                + header
                 + "}";
     }
 }

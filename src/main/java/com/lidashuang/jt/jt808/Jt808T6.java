@@ -2,10 +2,8 @@ package com.lidashuang.jt.jt808;
 
 import com.lidashuang.jt.JtMessage;
 import com.lidashuang.jt.JtUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * @author lidashuang
@@ -24,25 +22,29 @@ public class Jt808T6 extends JtMessage {
     /** 消息 ID：0x8100 */
     public static final int M_ID = 0x8100;
 
-    private final String phone;
+    private int number;
+    private int result;
+    private String authCode;
 
-    private final int number;
+    public Jt808T6(byte[] bytes) {
+        this.bytes = bytes;
+        this.header = new Header(this.bytes);
+    }
 
-    private final int result;
-
-    private final String authCode;
-
-    public Jt808T6(String phone, int number, int result, String authCode) {
-        super();
-        this.phone = phone;
+    public Jt808T6(int number, int result, String authCode) {
         this.number = number;
         this.result = result;
         this.authCode = authCode;
-        System.out.println(this.toString());
     }
 
     @Override
-    public void decode() {
+    public int getType() {
+        return M_ID;
+    }
+
+    @Override
+    public JtMessage decode() {
+        return this;
     }
 
     @Override
@@ -54,22 +56,12 @@ public class Jt808T6 extends JtMessage {
             outputStream.write(result);
             outputStream.write(authCode.getBytes("GBK"));
             final byte[] content = outputStream.toByteArray();
-            if (content.length < 1024) {
-                final HeadMessage headMessage = new HeadMessage(
-                        M_ID,
-                        12,
-                        content.length,
-                        0,
-                        false,
-                        phone,
-                        number,
-                        0,
-                        0
-                );
-                final byte[] result = new byte[content.length + headMessage.getHeadLength()];
-                System.arraycopy(headMessage.toBytes(), 0, result, 0, headMessage.getHeadLength());
-                System.arraycopy(content, headMessage.getHeadLength(), result, headMessage.getHeadLength(), content.length);
-                System.out.println("推送的数据为： " + Arrays.toString(result));
+            if (content.length <= MAX_MESSAGE_CONTENT_LENGTH) {
+                final Header rHeader = new Header(M_ID, 12, content.length, 0,
+                        false, DEFAULT_MESSAGE_PHONE, number, 0, 0);
+                final byte[] result = new byte[content.length + rHeader.getHeadLength()];
+                System.arraycopy(rHeader.toBytes(), 0, result, 0, rHeader.getHeadLength());
+                System.arraycopy(content, 0, result, rHeader.getHeadLength(), content.length);
                 return result;
             } else {
                 throw new RuntimeException("不支持多包  下次开放");
@@ -85,19 +77,5 @@ public class Jt808T6 extends JtMessage {
                 }
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return "{"
-                + "\"phone\":\""
-                + phone + '\"'
-                + ",\"number\":"
-                + number
-                + ",\"result\":"
-                + result
-                + ",\"authCode\":\""
-                + authCode + '\"'
-                + "}";
     }
 }
