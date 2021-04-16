@@ -20,7 +20,7 @@ public final class JtRegistry {
     private static final String DEFAULT_NAME = "__DEFAULT__";
 
     /** sync async // 同步 异步 */
-    private static String MODE = SYNC;
+    private static String MODE = ASYNC;
 
     /** 消息核心 */
     private static final Map<String, JtMessage> MESSAGE_CORE = new HashMap<>();
