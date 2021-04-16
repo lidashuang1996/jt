@@ -63,7 +63,9 @@ public class Jt808T6 extends JtMessage {
                 System.arraycopy(content, 0, result, rHeader.getHeadLength(), content.length);
                 return result;
             } else {
-                throw new RuntimeException("不支持多包  下次开放");
+                // 多包加密
+                // int a = (int) Math.ceil((double) content.length / MAX_MESSAGE_CONTENT_LENGTH);
+                throw new RuntimeException("不支持多包 ～");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -76,5 +78,17 @@ public class Jt808T6 extends JtMessage {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "{"
+                + "\"number\":"
+                + number
+                + ",\"result\":"
+                + result
+                + ",\"authCode\":\""
+                + authCode + '\"'
+                + "}";
     }
 }

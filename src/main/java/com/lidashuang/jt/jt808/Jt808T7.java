@@ -1,7 +1,6 @@
 package com.lidashuang.jt.jt808;
 
 import com.lidashuang.jt.JtMessage;
-import com.lidashuang.jt.JtUtils;
 
 import java.util.Arrays;
 

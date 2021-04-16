@@ -125,9 +125,9 @@ public class JtDecoder extends ByteToMessageDecoder {
     private static final byte MARK = 0x7e;
     /** 转义字符 */
     private static final byte MARK_T = 0x7d;
-    /** 转义字符 模型1*/
+    /** 转义字符 模型1 */
     private static final byte MARK_T_B1 = 0x02;
-    /** 转义字符 模型2*/
+    /** 转义字符 模型2 */
     private static final byte MARK_T_B2 = 0x01;
     /** 日志对象 */
     private static final Logger LOGGER = LoggerFactory.getLogger(JtDecoder.class);
@@ -269,9 +269,7 @@ public class JtDecoder extends ByteToMessageDecoder {
             // 获取类型
             final int type = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(data, 0, 2));
             LOGGER.info("JT 消息类型 ==> " + type);
-            JtMessage h = JtRegistry.getMessageCore(type).decode(data);
-            System.out.println(h);
-            return h;
+            return JtRegistry.getMessageCore(type).decode(data);
         } else {
             LOGGER.error("JT 消息校验码异常 ～ ");
             throw new Exception("JT 消息校验码异常 ～");

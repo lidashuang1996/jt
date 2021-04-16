@@ -3,6 +3,8 @@ package com.lidashuang.jt;
 import com.lidashuang.jt.actuator.Jt808T5Actuator;
 import com.lidashuang.jt.jt808.Jt808T5;
 import com.lidashuang.jt.jt808.Jt808T6;
+import com.lidashuang.jt.jt808.Jt808T7;
+import com.lidashuang.jt.jt808.Jt808T8;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -28,12 +30,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class JtApplication {
 
-    public static void main(String[] args) {
-        // SpringApplication.run(JtApplication.class, args);
+
+    static {
+        JtRegistry.registerJtMessage(Jt808T5.M_ID, new Jt808T5());
+        JtRegistry.registerJtMessage(Jt808T7.M_ID, new Jt808T7());
+        JtRegistry.registerJtMessage(Jt808T8.M_ID, new Jt808T8());
 
         JtRegistry.registerActuator(Jt808T5.M_ID, new Jt808T5Actuator());
-        JtRegistry.registerJtMessage(Jt808T5.M_ID, new Jt808T5());
+    }
 
+    public static void main(String[] args) {
+        // SpringApplication.run(JtApplication.class, args);
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
         // Worker线程
         final EventLoopGroup workerGroup = new NioEventLoopGroup();

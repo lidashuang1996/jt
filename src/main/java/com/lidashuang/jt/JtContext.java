@@ -3,8 +3,6 @@ package com.lidashuang.jt;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
-import java.util.Arrays;
-
 /**
  * 上下文
  * @author lidashuang
