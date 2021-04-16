@@ -143,6 +143,7 @@ public class JtEncoder extends MessageToByteEncoder<JtMessage> {
         Integer checkCode = null;
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
+            // 写入开始标记符号
             outputStream.write(MARK);
             for (final byte datum : data) {
                 checkCode = checkCode == null ? datum : (checkCode ^ datum);
@@ -153,9 +154,16 @@ public class JtEncoder extends MessageToByteEncoder<JtMessage> {
                     outputStream.write(MARK_T);
                     outputStream.write(MARK_T_B2);
                 } else {
-                    outputStream.write(checkCode);
+                    outputStream.write(datum);
                 }
             }
+            if (checkCode == null) {
+                LOGGER.error("推送的消息不能为空 ～");
+                throw new RuntimeException("推送的消息不能为空 ～");
+            }
+            // 写入校验码
+            outputStream.write(checkCode);
+            // 写入结尾标记符号
             outputStream.write(MARK);
             outputStream.flush();
             result = outputStream.toByteArray();

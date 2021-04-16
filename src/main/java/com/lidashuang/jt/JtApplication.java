@@ -1,5 +1,8 @@
 package com.lidashuang.jt;
 
+import com.lidashuang.jt.actuator.Jt808T5Actuator;
+import com.lidashuang.jt.jt808.Jt808T5;
+import com.lidashuang.jt.jt808.Jt808T6;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -27,6 +30,10 @@ public class JtApplication {
 
     public static void main(String[] args) {
         // SpringApplication.run(JtApplication.class, args);
+
+        JtRegistry.registerActuator(Jt808T5.M_ID, new Jt808T5Actuator());
+        JtRegistry.registerJtMessage(Jt808T5.M_ID, new Jt808T5());
+
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
         // Worker线程
         final EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -45,8 +52,8 @@ public class JtApplication {
                             // 管道中添加处理器
                             channel.pipeline()
                                     .addLast(new JtDecoder())
-                                    .addLast(new JtHandler())
-                                    .addLast(new JtEncoder());
+                                    .addLast(new JtEncoder())
+                                    .addLast(new JtHandler());
                         }
                     })
                     .option(ChannelOption.SO_BROADCAST, true)

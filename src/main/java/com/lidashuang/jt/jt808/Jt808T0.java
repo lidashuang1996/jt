@@ -11,9 +11,10 @@ import java.util.Arrays;
  */
 public class Jt808T0 extends JtMessage {
 
+    public Jt808T0() { }
+
     public Jt808T0(byte[] bytes) {
         this.bytes = bytes;
-        this.header = new Header(this.bytes);
     }
 
     @Override
@@ -31,7 +32,9 @@ public class Jt808T0 extends JtMessage {
     }
 
     @Override
-    public JtMessage decode() {
+    public JtMessage decode(byte[] bytes) {
+        this.bytes = bytes;
+        this.header = new Header(this.bytes);
         return this;
     }
 

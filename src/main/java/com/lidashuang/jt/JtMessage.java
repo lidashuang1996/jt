@@ -59,7 +59,7 @@ public abstract class JtMessage  {
      * 解码 [消息头 + 消息内容]
      * @return 解码后的消息对象
      */
-    public abstract JtMessage decode();
+    public abstract JtMessage decode(byte[] bytes);
 
     /**
      * 消息头的模型

@@ -26,10 +26,7 @@ public class Jt808T6 extends JtMessage {
     private int result;
     private String authCode;
 
-    public Jt808T6(byte[] bytes) {
-        this.bytes = bytes;
-        this.header = new Header(this.bytes);
-    }
+    public Jt808T6() { }
 
     public Jt808T6(int number, int result, String authCode) {
         this.number = number;
@@ -43,7 +40,9 @@ public class Jt808T6 extends JtMessage {
     }
 
     @Override
-    public JtMessage decode() {
+    public JtMessage decode(byte[] bytes) {
+        this.bytes = bytes;
+        this.header = new Header(this.bytes);
         return this;
     }
 

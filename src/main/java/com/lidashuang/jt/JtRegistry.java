@@ -1,7 +1,8 @@
 package com.lidashuang.jt;
 
 import com.lidashuang.jt.jt808.Jt808T0;
-import java.util.Hashtable;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,14 +17,16 @@ public final class JtRegistry {
     public static final String SYNC = "SYNC";
     public static final String ASYNC = "ASYNC";
 
+    private static final String DEFAULT_NAME = "__DEFAULT__";
+
     /** sync async // 同步 异步 */
     private static String MODE = SYNC;
 
     /** 消息核心 */
-    private static final Map<Integer, JtMessage> MESSAGE_CORE = new Hashtable<>();
+    private static final Map<String, JtMessage> MESSAGE_CORE = new HashMap<>();
 
     /** 处理核心 */
-    private static final Map<Integer, JtActuator> ACTUATOR_CORE = new Hashtable<>();
+    private static final Map<String, JtActuator> ACTUATOR_CORE = new HashMap<>();
 
     /** 处理线程池 */
     private static ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(5,
@@ -31,9 +34,9 @@ public final class JtRegistry {
 
     static {
         /* 设置默认的消息核心 */
-        MESSAGE_CORE.put(null, new Jt808T0());
+        MESSAGE_CORE.put(DEFAULT_NAME, new Jt808T0());
         /* 设置默认的处理器核心 */
-        ACTUATOR_CORE.put(null, new JtGlobalDefaultActuator());
+        ACTUATOR_CORE.put(DEFAULT_NAME, new JtGlobalDefaultActuator());
     }
 
     /**
@@ -41,20 +44,12 @@ public final class JtRegistry {
      * @param key 消息的状态
      * @return 获取消息的核心
      */
-    public static JtMessage getMessageCore(Integer key) {
-        JtMessage message = MESSAGE_CORE.get(key);
+    public static JtMessage getMessageCore(int key) {
+        JtMessage message = MESSAGE_CORE.get(String.valueOf(key));
         if (message == null) {
-            message = MESSAGE_CORE.get(null);
+            message = MESSAGE_CORE.get(DEFAULT_NAME);
         }
         return message;
-    }
-
-    /**
-     * 获取消息的核心列表
-     * @return 消息的核心列表
-     */
-    public static Map<Integer, JtMessage> getMessageCore() {
-        return MESSAGE_CORE;
     }
 
     /**
@@ -62,20 +57,12 @@ public final class JtRegistry {
      * @param key 消息的状态
      * @return 消息的处理器
      */
-    public static JtActuator getActuatorCore(Integer key) {
-        JtActuator actuator = ACTUATOR_CORE.get(key);
+    public static JtActuator getActuatorCore(int key) {
+        JtActuator actuator = ACTUATOR_CORE.get(String.valueOf(key));
         if (actuator == null) {
-            actuator = ACTUATOR_CORE.get(null);
+            actuator = ACTUATOR_CORE.get(DEFAULT_NAME);
         }
         return actuator;
-    }
-
-    /**
-     * 获取消息的处理器列表
-     * @return 消息的处理器列表
-     */
-    public static Map<Integer, JtActuator> getActuatorCore() {
-        return ACTUATOR_CORE;
     }
 
     /**
@@ -130,6 +117,14 @@ public final class JtRegistry {
      */
     public static String getMode() {
         return MODE;
+    }
+
+    public synchronized static void registerJtMessage(int key, JtMessage value) {
+        MESSAGE_CORE.put(String.valueOf(key), value);
+    }
+
+    public synchronized static void registerActuator(int key, JtActuator value) {
+        ACTUATOR_CORE.put(String.valueOf(key), value);
     }
 
     /**

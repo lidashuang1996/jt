@@ -3,6 +3,8 @@ package com.lidashuang.jt;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.util.Arrays;
+
 /**
  * 上下文
  * @author lidashuang
@@ -30,7 +32,7 @@ public class JtContext {
             final Channel channel = context.channel();
             if (channel != null) {
                 // 得到消息编码后的内容并发送出去
-                channel.writeAndFlush(message.encode());
+                channel.writeAndFlush(message);
             }
         }
     }

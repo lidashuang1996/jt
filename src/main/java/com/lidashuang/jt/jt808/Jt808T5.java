@@ -39,10 +39,7 @@ public class Jt808T5 extends JtMessage {
     private int licensePlateColor;
     private String vehicleMark;
 
-    public Jt808T5(byte[] bytes) {
-        this.bytes = bytes;
-        this.header = new Header(this.bytes);
-    }
+    public Jt808T5() { }
 
     public Jt808T5(int province, int city, String manufacturer, String terminalModel,
                    String terminalId, int licensePlateColor, String vehicleMark) {
@@ -61,8 +58,10 @@ public class Jt808T5 extends JtMessage {
     }
 
     @Override
-    public JtMessage decode() {
+    public JtMessage decode(byte[] bytes) {
         try {
+            this.bytes = bytes;
+            this.header = new Header(this.bytes);
             final int contentLength = this.header.getContentLength();
             final byte[] content = new byte[contentLength];
             System.arraycopy(bytes, this.header.getHeadLength(), content, 0, contentLength);
@@ -83,7 +82,9 @@ public class Jt808T5 extends JtMessage {
     @Override
     public byte[] encode() {
         // 以后处理 客户端需要
-        return new byte[0];
+        return new byte[] {
+                0, 1, 2, 3, 4
+        };
     }
 
     @Override

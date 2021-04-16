@@ -18,21 +18,16 @@ public class Jt808T7 extends JtMessage {
     /** 消息 ID：0x0003 */
     public static final int M_ID = 0x0003;
 
-    public Jt808T7() { }
-
-    public Jt808T7(byte[] bytes) {
-        this.bytes = bytes;
-        this.header = new Header(this.bytes);
-    }
-
     @Override
     public int getType() {
         return M_ID;
     }
 
     @Override
-    public JtMessage decode() {
+    public JtMessage decode(byte[] bytes) {
         try {
+            this.bytes = bytes;
+            this.header = new Header(this.bytes);
             final int cLength = this.header.getContentLength();
             if (cLength == 0) {
                 throw new Exception("消息内容理论为空，现在存在内容, 内容为 ==> " + Arrays.toString(this.bytes));

@@ -25,14 +25,13 @@ public class Jt808T8 extends JtMessage {
         this.authCode = authCode;
     }
 
-    public Jt808T8(byte[] bytes) {
-        this.bytes = bytes;
-        this.header = new Header(this.bytes);
-    }
+    public Jt808T8() { }
 
     @Override
-    public JtMessage decode() {
+    public JtMessage decode(byte[] bytes) {
         try {
+            this.bytes = bytes;
+            this.header = new Header(this.bytes);
             final int contentLength = this.header.getContentLength();
             final byte[] content = new byte[contentLength];
             System.arraycopy(this.bytes, this.header.getHeadLength(), content, 0, contentLength);
