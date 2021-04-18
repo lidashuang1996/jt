@@ -10,6 +10,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
@@ -36,11 +37,15 @@ public class JtApplication {
         JtRegistry.registerJtMessage(Jt808T7.M_ID, new Jt808T7());
         JtRegistry.registerJtMessage(Jt808T8.M_ID, new Jt808T8());
 
+        // 处理登录消息
+        // 终端注册
         JtRegistry.registerActuator(Jt808T5.M_ID, new Jt808T5Actuator());
+        // 终端鉴权
+        JtRegistry.registerActuator(Jt808T8.M_ID, new Jt808T5Actuator());
     }
 
     public static void main(String[] args) {
-        // SpringApplication.run(JtApplication.class, args);
+        SpringApplication.run(JtApplication.class, args);
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
         // Worker线程
         final EventLoopGroup workerGroup = new NioEventLoopGroup();

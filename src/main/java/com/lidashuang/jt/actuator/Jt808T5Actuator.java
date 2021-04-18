@@ -20,11 +20,11 @@ public class Jt808T5Actuator implements JtActuator {
     public void execute(JtContext context, JtMessage message) {
         // 注册
         LOGGER.info(
-                "注册 ==> " + message.getHeader()
+                "[接受到消息] 注册 ==> " + message.toString()
                 + ", 实际需要缓存核对操作"
         );
         final Jt808T6 jt808T6 = new Jt808T6(message.getHeader().getNumber(), 0, JtUtils.generateUUID());
-        LOGGER.info("注册返回的消息为 ==> " + jt808T6.toString());
+        LOGGER.info("[发送到消息] 注册 ==> " + jt808T6.toString());
         context.sendMessage(jt808T6);
     }
 

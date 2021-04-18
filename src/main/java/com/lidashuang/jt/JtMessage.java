@@ -57,6 +57,7 @@ public abstract class JtMessage  {
 
     /**
      * 解码 [消息头 + 消息内容]
+     * @param bytes 解码的参数
      * @return 解码后的消息对象
      */
     public abstract JtMessage decode(byte[] bytes);
@@ -222,6 +223,7 @@ public abstract class JtMessage  {
                     outputStream.write(JtUtils.integerToHigh8Low8(this.subcontractLength));
                     outputStream.write(JtUtils.integerToHigh8Low8(this.subcontractIndex));
                 }
+                // 1, 0, 0, 35, 0, 0, 0, 0, 0, 0, 1, 1,
                 return outputStream.toByteArray();
             } catch (Exception e) {
                 e.printStackTrace();

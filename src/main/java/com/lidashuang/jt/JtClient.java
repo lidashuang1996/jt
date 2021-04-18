@@ -46,6 +46,10 @@ public class JtClient {
                                 byte[] bytes = new byte[] {
                                         126, 1, 0, 0, 54, 0, 4, 121, 55, 83, 41, 17, -127, 0, 0, 0, 0, 0, 0, 3, 32, 125, 1, 72, 68, 67, 84, 77, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 57, 50, 65, 70, 69, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 126
                                 };
+// 1, 0,   0, 35,    0, 0, 0, 0, 0, 0, 1, 1,
+//                                byte[] bytes = new byte[] {
+//                                        126, 1, 0, 0, 35, 0, 0, 0, 0, 0, 0, 2, 1, 2, 1, 0, 50, 54, 67, 52, 52, 70, 55, 56, 49, 51, 52, 68, 52, 48, 65, 53, 56, 48, 53, 55, 70, 49, 55, 54, 49, 49, 56, 53, 55, 67, 67, 69, 45, 126
+//                                };
                                 System.out.println(Arrays.toString(bytes));
                                 channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(bytes));
                             }
@@ -98,6 +102,6 @@ public class JtClient {
                     }
                 });
         //发起异步连接请求，绑定连接端口和host信息
-        final ChannelFuture future = b.connect("127.0.0.1", 7611).sync();
+        final ChannelFuture future = b.connect("139.159.216.99", 7611).sync();
     }
 }

@@ -2,7 +2,6 @@ package com.lidashuang.jt.jt808;
 
 import com.lidashuang.jt.JtMessage;
 import com.lidashuang.jt.JtUtils;
-import java.util.Arrays;
 
 /**
  * @author lidashuang
@@ -102,8 +101,6 @@ public class Jt808T5 extends JtMessage {
                 + licensePlateColor
                 + ",\"vehicleMark\":\""
                 + vehicleMark + '\"'
-                + ",\"bytes\":"
-                + Arrays.toString(bytes)
                 + ",\"header\":"
                 + header
                 + "}";

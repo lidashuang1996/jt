@@ -52,13 +52,12 @@ public class Jt808T8 extends JtMessage {
         return new byte[0];
     }
 
+
     @Override
     public String toString() {
         return "{"
                 + "\"authCode\":\""
                 + authCode + '\"'
-                + ",\"bytes\":"
-                + Arrays.toString(bytes)
                 + ",\"header\":"
                 + header
                 + "}";

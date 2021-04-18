@@ -52,15 +52,17 @@ public class Jt808T6 extends JtMessage {
         try {
             outputStream = new ByteArrayOutputStream();
             outputStream.write(JtUtils.integerToHigh8Low8(number));
-            outputStream.write(result);
+            outputStream.write((byte) result);
             outputStream.write(authCode.getBytes("GBK"));
             final byte[] content = outputStream.toByteArray();
             if (content.length <= MAX_MESSAGE_CONTENT_LENGTH) {
                 final Header rHeader = new Header(M_ID, 12, content.length, 0,
                         false, DEFAULT_MESSAGE_PHONE, number, 0, 0);
                 final byte[] result = new byte[content.length + rHeader.getHeadLength()];
+                System.out.println(rHeader.toString());
                 System.arraycopy(rHeader.toBytes(), 0, result, 0, rHeader.getHeadLength());
                 System.arraycopy(content, 0, result, rHeader.getHeadLength(), content.length);
+                this.header = rHeader;
                 return result;
             } else {
                 // 多包加密
@@ -80,6 +82,7 @@ public class Jt808T6 extends JtMessage {
         }
     }
 
+
     @Override
     public String toString() {
         return "{"
@@ -89,6 +92,8 @@ public class Jt808T6 extends JtMessage {
                 + result
                 + ",\"authCode\":\""
                 + authCode + '\"'
+                + ",\"header\":"
+                + header
                 + "}";
     }
 }

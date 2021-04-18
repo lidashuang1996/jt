@@ -28,10 +28,10 @@ import java.util.zip.Inflater;
 public final class JtUtils {
 
     public static void main(String[] args) {
-        System.out.println(new String(new byte[] { 0 }));
-        System.out.println( Integer.toBinaryString(258));
-        System.out.println( Integer.toBinaryString(256));
-        System.out.println( Integer.toBinaryString(3));
+        System.out.println( Integer.toBinaryString(33024));
+        System.out.println(new String(new byte[] {
+                0, 3, 0, 0, 39, 32, 22, 99, 64, 35, 2, -105
+        }));
     }
     /**
      * 生成 UUID
@@ -92,7 +92,7 @@ public final class JtUtils {
     }
 
     public static byte[] integerToHigh8Low8(int data) {
-        return new byte[] { (byte) ((data >> 8) & 0x0F), (byte) (data & 0x0F) };
+        return new byte[] { (byte) ((data >> 8) & 0xFF), (byte) (data & 0xFF) };
     }
 
     public static String integerToBinaryString(int data) {
