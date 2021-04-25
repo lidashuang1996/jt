@@ -2,6 +2,7 @@ package com.lidashuang.jt.jt808;
 
 import com.lidashuang.jt.JtMessage;
 import com.lidashuang.jt.JtUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,25 +20,22 @@ import java.util.Arrays;
  * 2        结果         BYTE       0：成功；1：车辆已被注册；2：数据库中无该车辆；3：终端已被注册；4：数据库中无该终端
  * 3        鉴权码       STRING     只有在成功后才有该字段
  */
-public class Jt808T6 extends JtMessage {
+public class Jt808T_1 extends JtMessage {
     /** 消息 ID：0x8100 */
-    public static final int M_ID = 0x8100;
-
-    // 0000 0000 0000 0001 // 0000 0001 0000 0000 // 256
-    // 0000 0000 0001 1000 // 1000 0001 0000 0000 // 256 * 129 =
+    public static final int M_ID = 0x8001;
 
     private String phone;
     private int number;
+    private int messageId;
     private int result;
-    private String authCode;
 
-    public Jt808T6() { }
+    public Jt808T_1() { }
 
-    public Jt808T6(String phone, int number, int result, String authCode) {
+    public Jt808T_1(String phone, int number, int messageId, int result) {
         this.phone = phone;
         this.number = number;
         this.result = result;
-        this.authCode = authCode;
+        this.messageId = messageId;
     }
 
     @Override
@@ -49,18 +47,6 @@ public class Jt808T6 extends JtMessage {
     public JtMessage decode(byte[] bytes) {
         this.bytes = bytes;
         this.header = new Header(this.bytes);
-
-        final int contentLength = this.header.getContentLength();
-        final byte[] content = new byte[contentLength];
-        System.arraycopy(bytes, this.header.getHeadLength(), content, 0, contentLength);
-
-        this.number = JtUtils.bytesToHigh8Low8(new byte[] {
-                content[0], content[1]
-        });
-
-        this.result = content[2];
-
-        this.authCode = new String(JtUtils.bytesArrayIntercept(content, 3, content.length - 3));
         return this;
     }
 
@@ -70,8 +56,8 @@ public class Jt808T6 extends JtMessage {
         try {
             outputStream = new ByteArrayOutputStream();
             outputStream.write(JtUtils.integerToHigh8Low8(number));
+            outputStream.write(JtUtils.integerToHigh8Low8(messageId));
             outputStream.write((byte) result);
-            outputStream.write(authCode.getBytes("GBK"));
             final byte[] content = outputStream.toByteArray();
             if (content.length <= MAX_MESSAGE_CONTENT_LENGTH) {
                 final Header rHeader = new Header(M_ID, 12, content.length, 0,
@@ -114,8 +100,8 @@ public class Jt808T6 extends JtMessage {
                 + number
                 + ",\"result\":"
                 + result
-                + ",\"authCode\":\""
-                + authCode + '\"'
+                + ",\"messageId\":\""
+                + messageId + '\"'
                 + "}";
     }
 }

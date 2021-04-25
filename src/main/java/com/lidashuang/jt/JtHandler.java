@@ -11,6 +11,11 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class JtHandler extends ChannelInboundHandlerAdapter {
 
     /**
+     * 一个连接只有一个上下文对象
+     */
+    private JtContext jtContext;
+
+    /**
      * 每次收到消息处理的勾子函数
      * @param context 上下文对象
      * @param message 收到的消息内容
@@ -21,12 +26,16 @@ public class JtHandler extends ChannelInboundHandlerAdapter {
             final JtMessage jtMessage = (JtMessage) message;
             final JtActuator jtActuator = JtRegistry.getActuatorCore(jtMessage.getType());
             if (jtActuator != null) {
+                if (jtContext == null) {
+                    jtContext = new JtContext(context);
+                    jtContext.setAttribute("phone", jtMessage.getHeader().getPhone());
+                }
                 if (JtRegistry.ASYNC.equals(JtRegistry.getMode())) {
                     // 线程池中执行
-                    JtRegistry.executeThreadPool(() -> jtActuator.execute(new JtContext(context), jtMessage));
+                    JtRegistry.executeThreadPool(() -> jtActuator.execute(jtContext, jtMessage));
                 } else {
                     // 立即执行
-                    jtActuator.execute(new JtContext(context), jtMessage);
+                    jtActuator.execute(jtContext, jtMessage);
                 }
             }
         }

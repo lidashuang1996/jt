@@ -62,4 +62,8 @@ public class Jt808T8 extends JtMessage {
                 + header
                 + "}";
     }
+
+    public String getAuthCode() {
+        return authCode;
+    }
 }

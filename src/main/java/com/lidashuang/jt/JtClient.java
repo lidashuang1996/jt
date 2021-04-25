@@ -1,5 +1,8 @@
 package com.lidashuang.jt;
 
+import com.lidashuang.jt.actuator.Jt808T5Actuator;
+import com.lidashuang.jt.jt808.Jt808T5;
+import com.lidashuang.jt.jt808.Jt808T6;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -20,6 +23,10 @@ import java.util.Scanner;
  */
 public class JtClient {
     public static void main(String[] args) throws InterruptedException {
+        // 终端注册
+        JtRegistry.registerJtMessage(Jt808T6.M_ID, new Jt808T6());
+
+
         final EventLoopGroup group = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
         b.group(group).channel(NioSocketChannel.class)
@@ -28,6 +35,7 @@ public class JtClient {
                     public void initChannel(SocketChannel ch) throws Exception {
                         System.out.println("正在连接中...");
                         ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new JtDecoder());
                         pipeline.addLast(new ChannelInboundHandler() {
                             @Override
                             public void channelRegistered(ChannelHandlerContext channelHandlerContext) throws Exception {
@@ -61,11 +69,15 @@ public class JtClient {
 
                             @Override
                             public void channelRead(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
-                                // 读取数据流
-                                ByteBuf byteBuf = (ByteBuf) o;
-                                final byte[] bytes = new byte[byteBuf.readableBytes()];
-                                byteBuf.readBytes(bytes);
-                                System.out.println("收到  " + Arrays.toString(bytes));
+                                if (o instanceof Jt808T6) {
+                                    System.out.println(o.toString());
+                                } else if (o instanceof ByteBuf) {
+                                    // 读取数据流
+                                    ByteBuf byteBuf = (ByteBuf) o;
+                                    final byte[] bytes = new byte[byteBuf.readableBytes()];
+                                    byteBuf.readBytes(bytes);
+                                    System.out.println("收到  " + Arrays.toString(bytes));
+                                }
                             }
 
                             @Override
@@ -101,7 +113,9 @@ public class JtClient {
 
                     }
                 });
-        //发起异步连接请求，绑定连接端口和host信息
+        //发起异步连接请求，绑定连接端口和host信息  139.159.216.99
+//         final ChannelFuture future = b.connect("127.0.0.1", 7611).sync();
         final ChannelFuture future = b.connect("139.159.216.99", 7611).sync();
+
     }
 }

@@ -3,6 +3,9 @@ package com.lidashuang.jt;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 上下文
  * @author lidashuang
@@ -12,6 +15,8 @@ public class JtContext {
 
     /** netty 的上下文 */
     private final ChannelHandlerContext context;
+
+    private final Map<String, String> attribute = new HashMap<>();
 
     /**
      * 构造输入 netty 的上下文
@@ -33,5 +38,17 @@ public class JtContext {
                 channel.writeAndFlush(message);
             }
         }
+    }
+
+    public String getAttribute(String key) {
+        return attribute.get(key);
+    }
+
+    public synchronized void delAttribute(String key) {
+        attribute.remove(key);
+    }
+
+    public synchronized void setAttribute(String key, String value) {
+        attribute.put(key, value);
     }
 }

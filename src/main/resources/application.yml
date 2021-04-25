@@ -1,2 +1,7 @@
 server:
   port: 9888
+
+
+# 日志的配置文件
+logging:
+  config: classpath:logback-config.xml

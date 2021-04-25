@@ -1,6 +1,7 @@
 package com.lidashuang.jt;
 
 import com.lidashuang.jt.actuator.Jt808T5Actuator;
+import com.lidashuang.jt.actuator.Jt808T8Actuator;
 import com.lidashuang.jt.jt808.Jt808T5;
 import com.lidashuang.jt.jt808.Jt808T6;
 import com.lidashuang.jt.jt808.Jt808T7;
@@ -41,7 +42,7 @@ public class JtApplication {
         // 终端注册
         JtRegistry.registerActuator(Jt808T5.M_ID, new Jt808T5Actuator());
         // 终端鉴权
-        JtRegistry.registerActuator(Jt808T8.M_ID, new Jt808T5Actuator());
+        JtRegistry.registerActuator(Jt808T8.M_ID, new Jt808T8Actuator());
     }
 
     public static void main(String[] args) {

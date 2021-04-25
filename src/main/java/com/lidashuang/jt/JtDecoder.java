@@ -135,6 +135,7 @@ public class JtDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext,
                           ByteBuf byteBuf, List<Object> list) throws Exception {
+        System.out.println("接收到内容了。。。。。。。。");
         // 读取数据流
         final byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);

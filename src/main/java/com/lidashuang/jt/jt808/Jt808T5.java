@@ -68,7 +68,7 @@ public class Jt808T5 extends JtMessage {
             this.terminalModel = JtUtils.bytesToHex(JtUtils.bytesArrayIntercept(content, 9, 20));
             this.terminalId = new String(JtUtils.bytesArrayIntercept(content, 29, 7));
             this.licensePlateColor = content[36];
-            this.vehicleMark = new String(JtUtils.bytesArrayIntercept(content, 37, contentLength - 37), "GBK");
+            this.vehicleMark = new String(JtUtils.bytesArrayIntercept(content, 37, contentLength - 37));
         } catch (Exception e) {
             // 抛出异常，终止执行
             throw new RuntimeException(e);
