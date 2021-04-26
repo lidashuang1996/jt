@@ -25,7 +25,7 @@ import java.util.zip.Inflater;
  * 15. JSON 反序列工具
  * @version 1.0
  */
-public final class JtUtils {
+public final class JttUtils {
 
     public static void main(String[] args) {
         System.out.println( Integer.toBinaryString(33024));

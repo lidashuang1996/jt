@@ -1,5 +1,6 @@
 package com.lidashuang.jt;
 
+import com.lidashuang.jt.message.JttMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -119,7 +120,7 @@ import java.util.Arrays;
  * @author lidashuang
  * @version 1.0
  */
-public class JtEncoder extends MessageToByteEncoder<JtMessage> {
+public class JtEncoder extends MessageToByteEncoder<JttMessage> {
 
     /** 标记字符 */
     private static final byte MARK = 0x7e;
@@ -133,7 +134,7 @@ public class JtEncoder extends MessageToByteEncoder<JtMessage> {
     private static final Logger LOGGER = LoggerFactory.getLogger(JtEncoder.class);
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, JtMessage jtMessage, ByteBuf byteBuf) {
+    protected void encode(ChannelHandlerContext channelHandlerContext, JttMessage jtMessage, ByteBuf byteBuf) {
         // 输出的结果
         byte[] result = new byte[0];
         // 消息编码得到原本数据

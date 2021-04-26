@@ -1,5 +1,6 @@
 package com.lidashuang.jt;
 
+import com.lidashuang.jt.message.JttMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -22,8 +23,8 @@ public class JtHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext context, Object message) {
-        if (message instanceof JtMessage) {
-            final JtMessage jtMessage = (JtMessage) message;
+        if (message instanceof JttMessage) {
+            final JttMessage jtMessage = (JttMessage) message;
             final JtActuator jtActuator = JtRegistry.getActuatorCore(jtMessage.getType());
             if (jtActuator != null) {
                 if (jtContext == null) {

@@ -1,5 +1,6 @@
 package com.lidashuang.jt;
 
+import com.lidashuang.jt.message.JttMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -149,9 +150,9 @@ public class JtDecoder extends ByteToMessageDecoder {
      * @return 解析的消息对象
      * @throws Exception 解析出现的异常
      */
-    private static List<JtMessage> jtDecode(byte[] bytes) throws Exception {
+    private static List<JttMessage> jtDecode(byte[] bytes) throws Exception {
         // 创建返回的集合对象
-        final List<JtMessage> result = new ArrayList<>();
+        final List<JttMessage> result = new ArrayList<>();
         // 验证一下参数
         if (bytes == null || bytes.length == 0) {
             // 抛出异常 @0 用来快速定位
@@ -207,7 +208,7 @@ public class JtDecoder extends ByteToMessageDecoder {
      * @return 解析后的对象
      * @throws Exception 解析过程出现的异常
      */
-    private static JtMessage jtDecodeByteToMessage(byte[] bytes) throws Exception {
+    private static JttMessage jtDecodeByteToMessage(byte[] bytes) throws Exception {
         // * 规则定义如下：
         // * 0x7e <————> 0x7d 后紧跟一个 0x02
         // * 0x7d <————> 0x7d 后紧跟一个 0x01
@@ -268,7 +269,7 @@ public class JtDecoder extends ByteToMessageDecoder {
         // 校验码是否正确
         if (checkStatus) {
             // 获取类型
-            final int type = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(data, 0, 2));
+            final int type = JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(data, 0, 2));
             LOGGER.info("JT 消息类型 ==> " + type);
             return JtRegistry.getMessageCore(type).decode(data);
         } else {

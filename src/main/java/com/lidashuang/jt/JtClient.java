@@ -1,8 +1,6 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.actuator.Jt808T5Actuator;
-import com.lidashuang.jt.jt808.Jt808T5;
-import com.lidashuang.jt.jt808.Jt808T6;
+import com.lidashuang.jt.jt808.Jtt808T6;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -11,11 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.util.Arrays;
-import java.util.Scanner;
 
 /**
  * @author lidashuang
@@ -24,7 +18,7 @@ import java.util.Scanner;
 public class JtClient {
     public static void main(String[] args) throws InterruptedException {
         // 终端注册
-        JtRegistry.registerJtMessage(Jt808T6.M_ID, new Jt808T6());
+        JtRegistry.registerJtMessage(Jtt808T6.M_ID, new Jtt808T6());
 
 
         final EventLoopGroup group = new NioEventLoopGroup();
@@ -69,7 +63,7 @@ public class JtClient {
 
                             @Override
                             public void channelRead(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
-                                if (o instanceof Jt808T6) {
+                                if (o instanceof Jtt808T6) {
                                     System.out.println(o.toString());
                                 } else if (o instanceof ByteBuf) {
                                     // 读取数据流

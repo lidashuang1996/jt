@@ -1,6 +1,7 @@
 package com.lidashuang.jt;
 
 import com.lidashuang.jt.jt808.Jt808T0;
+import com.lidashuang.jt.message.JttMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ public final class JtRegistry {
     private static String MODE = ASYNC;
 
     /** 消息核心 */
-    private static final Map<String, JtMessage> MESSAGE_CORE = new HashMap<>();
+    private static final Map<String, JttMessage> MESSAGE_CORE = new HashMap<>();
 
     /** 处理核心 */
     private static final Map<String, JtActuator> ACTUATOR_CORE = new HashMap<>();
@@ -44,8 +45,8 @@ public final class JtRegistry {
      * @param key 消息的状态
      * @return 获取消息的核心
      */
-    public static JtMessage getMessageCore(int key) {
-        JtMessage message = MESSAGE_CORE.get(String.valueOf(key));
+    public static JttMessage getMessageCore(int key) {
+        JttMessage message = MESSAGE_CORE.get(String.valueOf(key));
         if (message == null) {
             message = MESSAGE_CORE.get(DEFAULT_NAME);
         }
@@ -119,7 +120,7 @@ public final class JtRegistry {
         return MODE;
     }
 
-    public synchronized static void registerJtMessage(int key, JtMessage value) {
+    public synchronized static void registerJtMessage(int key, JttMessage value) {
         MESSAGE_CORE.put(String.valueOf(key), value);
     }
 

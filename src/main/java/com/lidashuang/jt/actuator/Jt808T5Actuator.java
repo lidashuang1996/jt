@@ -2,9 +2,9 @@ package com.lidashuang.jt.actuator;
 
 import com.lidashuang.jt.JtActuator;
 import com.lidashuang.jt.JtContext;
-import com.lidashuang.jt.JtMessage;
-import com.lidashuang.jt.JtUtils;
-import com.lidashuang.jt.jt808.Jt808T6;
+import com.lidashuang.jt.message.JttMessage;
+import com.lidashuang.jt.JttUtils;
+import com.lidashuang.jt.jt808.Jtt808T6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ public class Jt808T5Actuator implements JtActuator {
     private static final Logger LOGGER = LoggerFactory.getLogger(Jt808T5Actuator.class);
 
     @Override
-    public void execute(JtContext context, JtMessage message) {
+    public void execute(JtContext context, JttMessage message) {
         // 注册
         LOGGER.info(
                 "[接受到消息] 注册 ==> " + message.toString()
@@ -29,9 +29,9 @@ public class Jt808T5Actuator implements JtActuator {
         }
         context.setAttribute("index", String.valueOf(Integer.parseInt(index) + 1));
 
-        String uuid = JtUtils.generateUUID();
+        String uuid = JttUtils.generateUUID();
         uuid = uuid.length() >= 16 ? uuid.substring(0, 16) : (uuid + "0000000000000000").substring(0, 16);
-        final Jt808T6 jt808T6 = new Jt808T6(context.getAttribute("phone"), Integer.parseInt(index), 0, uuid);
+        final Jtt808T6 jt808T6 = new Jtt808T6(context.getAttribute("phone"), Integer.parseInt(index), 0, uuid);
         LOGGER.info("[发送到消息] 注册 ==> " + jt808T6.toString());
         context.sendMessage(jt808T6);
     }

@@ -1,5 +1,6 @@
-package com.lidashuang.jt;
+package com.lidashuang.jt.message;
 
+import com.lidashuang.jt.JttUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,22 +11,16 @@ import java.io.IOException;
  * @author lidashuang
  * @version 1.0
  */
-public abstract class JtMessage  {
+public abstract class JttMessage implements JttMessageCodec {
 
     /** 日志对象 */
-    protected static final Logger LOGGER = LoggerFactory.getLogger(JtMessage.class);
-
-    /** 最大消息长度 */
-    protected static final int MAX_MESSAGE_CONTENT_LENGTH = 1024;
-
-    /** 默认的消息长度 */
-    protected static final String DEFAULT_MESSAGE_PHONE = "000000000000";
+    protected static final Logger LOGGER = LoggerFactory.getLogger(JttMessage.class);
 
     /** 消息源字节码数据 */
     protected byte[] bytes;
 
     /** 消息头 */
-    protected Header header;
+    //protected Header header;
 
     /**
      * 获取消息内容
@@ -35,32 +30,12 @@ public abstract class JtMessage  {
         return bytes;
     }
 
-    /**
-     * 获取头部对象
-     * @return 头部对象
-     */
-    public Header getHeader() {
-        return header;
-    }
 
     /**
      * 获取消息类型
      * @return 消息类型
      */
-    public abstract int getType();
-
-    /**
-     * 编码 [消息头 + 消息内容]
-     * @return 编码后内容的字节码
-     */
-    public abstract byte[] encode();
-
-    /**
-     * 解码 [消息头 + 消息内容]
-     * @param bytes 解码的参数
-     * @return 解码后的消息对象
-     */
-    public abstract JtMessage decode(byte[] bytes);
+    public abstract int getMid();
 
     /**
      * 消息头的模型
@@ -96,7 +71,7 @@ public abstract class JtMessage  {
         public Header(byte[] bytes) {
             if (bytes.length >= MIN_SIZE) {
                 // 消息的类型
-                this.id = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(bytes, 0, 2));
+                this.id = JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(bytes, 0, 2));
                 // 消息的加密类型
                 this.encryption = (bytes[2] >> 2) & 0x07;
                 // 消息是否分包
@@ -105,16 +80,16 @@ public abstract class JtMessage  {
                 this.headLength = (subcontract ? 16 : 12);
                 // 内容消息的长度
                 // 消息长度占 8 + 2 比特，最大表示长度为 2 ^ 10 = 1024
-                this.contentLength = JtUtils.bytesToHigh8Low8(new byte[] { (byte) (bytes[2] & 0x03), bytes[3] });
+                this.contentLength = JttUtils.bytesToHigh8Low8(new byte[] { (byte) (bytes[2] & 0x03), bytes[3] });
                 // 获取手机号码
                 this.phone
-                        = JtUtils.byteTo8421Code(bytes[4])
-                        + JtUtils.byteTo8421Code(bytes[5])
-                        + JtUtils.byteTo8421Code(bytes[6])
-                        + JtUtils.byteTo8421Code(bytes[7])
-                        + JtUtils.byteTo8421Code(bytes[8])
-                        + JtUtils.byteTo8421Code(bytes[9]);
-                this.number = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(bytes, 10, 2));
+                        = JttUtils.byteTo8421Code(bytes[4])
+                        + JttUtils.byteTo8421Code(bytes[5])
+                        + JttUtils.byteTo8421Code(bytes[6])
+                        + JttUtils.byteTo8421Code(bytes[7])
+                        + JttUtils.byteTo8421Code(bytes[8])
+                        + JttUtils.byteTo8421Code(bytes[9]);
+                this.number = JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(bytes, 10, 2));
                 // 分包的索引
                 int subcontractIndex = 0;
                 // 分包的长度
@@ -122,8 +97,8 @@ public abstract class JtMessage  {
                 // 写入分包数据
                 if (subcontract) {
                     if (bytes.length >= MAX_SIZE) {
-                        subcontractIndex = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(bytes, 14, 2));
-                        subcontractLength = JtUtils.bytesToHigh8Low8(JtUtils.bytesArrayIntercept(bytes, 12, 2));
+                        subcontractIndex = JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(bytes, 14, 2));
+                        subcontractLength = JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(bytes, 12, 2));
                     } else {
                         LOGGER.info("解码消息 HEADER 分包消息长度不够 ～");
                         throw new RuntimeException("解码消息 HEADER 分包消息长度不够 ～");
@@ -201,27 +176,27 @@ public abstract class JtMessage  {
                 // 创建输出流对象
                 outputStream = new ByteArrayOutputStream();
                 // 写入消息的 ID
-                outputStream.write(JtUtils.integerToHigh8Low8(this.id));
+                outputStream.write(JttUtils.integerToHigh8Low8(this.id));
                 // 消息属性的二进制字符串
                 final String attribute
                         = "00" // 留空
                         + (this.subcontract ? "1" : "0") // 是否分包
-                        + JtUtils.integerToBinaryString(this.encryption, 3) // 数据加密方式
-                        + JtUtils.integerToBinaryString(this.contentLength, 10); // 消息体长度
+                        + JttUtils.integerToBinaryString(this.encryption, 3) // 数据加密方式
+                        + JttUtils.integerToBinaryString(this.contentLength, 10); // 消息体长度
 
                 // 写入消息的属性的字节码数据
-                outputStream.write(JtUtils.binaryToByte(attribute.substring(0, 8)));
-                outputStream.write(JtUtils.binaryToByte(attribute.substring(8, 16)));
+                outputStream.write(JttUtils.binaryToByte(attribute.substring(0, 8)));
+                outputStream.write(JttUtils.binaryToByte(attribute.substring(8, 16)));
 
                 // 写入手机号码的字节码数据
-                outputStream.write(JtUtils.codeTo8421Bytes(this.phone));
+                outputStream.write(JttUtils.codeTo8421Bytes(this.phone));
                 // 写入消息的流水号
-                outputStream.write(JtUtils.integerToHigh8Low8(this.number));
+                outputStream.write(JttUtils.integerToHigh8Low8(this.number));
                 // 判断是否分包
                 if (this.subcontract) {
                     // 写入分包的字节码数据
-                    outputStream.write(JtUtils.integerToHigh8Low8(this.subcontractLength));
-                    outputStream.write(JtUtils.integerToHigh8Low8(this.subcontractIndex));
+                    outputStream.write(JttUtils.integerToHigh8Low8(this.subcontractLength));
+                    outputStream.write(JttUtils.integerToHigh8Low8(this.subcontractIndex));
                 }
                 // 1, 0, 0, 35, 0, 0, 0, 0, 0, 0, 1, 1,
                 return outputStream.toByteArray();

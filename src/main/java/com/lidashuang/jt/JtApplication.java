@@ -2,10 +2,9 @@ package com.lidashuang.jt;
 
 import com.lidashuang.jt.actuator.Jt808T5Actuator;
 import com.lidashuang.jt.actuator.Jt808T8Actuator;
-import com.lidashuang.jt.jt808.Jt808T5;
-import com.lidashuang.jt.jt808.Jt808T6;
-import com.lidashuang.jt.jt808.Jt808T7;
-import com.lidashuang.jt.jt808.Jt808T8;
+import com.lidashuang.jt.jt808.Jtt808T5;
+import com.lidashuang.jt.jt808.Jtt808T7;
+import com.lidashuang.jt.jt808.Jtt808T8;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -34,15 +33,15 @@ public class JtApplication {
 
 
     static {
-        JtRegistry.registerJtMessage(Jt808T5.M_ID, new Jt808T5());
-        JtRegistry.registerJtMessage(Jt808T7.M_ID, new Jt808T7());
-        JtRegistry.registerJtMessage(Jt808T8.M_ID, new Jt808T8());
+        JtRegistry.registerJtMessage(Jtt808T5.M_ID, new Jtt808T5());
+        JtRegistry.registerJtMessage(Jtt808T7.M_ID, new Jtt808T7());
+        JtRegistry.registerJtMessage(Jtt808T8.M_ID, new Jtt808T8());
 
         // 处理登录消息
         // 终端注册
-        JtRegistry.registerActuator(Jt808T5.M_ID, new Jt808T5Actuator());
+        JtRegistry.registerActuator(Jtt808T5.M_ID, new Jt808T5Actuator());
         // 终端鉴权
-        JtRegistry.registerActuator(Jt808T8.M_ID, new Jt808T8Actuator());
+        JtRegistry.registerActuator(Jtt808T8.M_ID, new Jt808T8Actuator());
     }
 
     public static void main(String[] args) {
@@ -68,10 +67,10 @@ public class JtApplication {
                                     .addLast(new JtEncoder())
                                     .addLast(new JtHandler());
                         }
-                    })
-                    .option(ChannelOption.SO_BROADCAST, true)
-                    .option(ChannelOption.SO_RCVBUF, 2048 * 1024)
-                    .option(ChannelOption.SO_SNDBUF, 1024 * 1024);
+                    });
+//                    .option(ChannelOption.SO_BROADCAST, true)
+//                    .option(ChannelOption.SO_RCVBUF, 2048 * 1024)
+//                    .option(ChannelOption.SO_SNDBUF, 1024 * 1024);
             // 启动服务器
             final ChannelFuture channelFuture = server.bind(7611).sync();
             channelFuture.channel().closeFuture().sync();

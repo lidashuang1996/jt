@@ -1,5 +1,6 @@
 package com.lidashuang.jt;
 
+import com.lidashuang.jt.message.JttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,7 @@ public class JtGlobalDefaultActuator implements JtActuator {
             LoggerFactory.getLogger(JtGlobalDefaultActuator.class);
 
     @Override
-    public void execute(JtContext context, JtMessage message) {
+    public void execute(JtContext context, JttMessage message) {
         LOGGER.info("全局默认处理器收到的消息 ==> " + message.toString());
     }
 
