@@ -145,6 +145,7 @@ public class JttDecoder extends ByteToMessageDecoder {
         // 读取数据流
         final byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
+        LOGGER.info("[ 接收的数据 ] ===> " + Arrays.toString(bytes));
         // 解码且添加到管道中
         list.addAll(jtDecode(bytes));
     }
@@ -216,6 +217,7 @@ public class JttDecoder extends ByteToMessageDecoder {
      * @return 解析后的对象
      * @throws Exception 解析过程出现的异常
      */
+    @SuppressWarnings("all")
     private JttMessage jtDecodeByteToMessage(byte[] bytes) throws Exception {
         // * 规则定义如下：
         // * 0x7e <————> 0x7d 后紧跟一个 0x02

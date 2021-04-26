@@ -108,8 +108,8 @@ public class JttClient {
                     }
                 });
         //发起异步连接请求，绑定连接端口和host信息  139.159.216.99
-//         final ChannelFuture future = b.connect("127.0.0.1", 7611).sync();
-        final ChannelFuture future = b.connect("139.159.216.99", 7611).sync();
+         final ChannelFuture future = b.connect("127.0.0.1", 7611).sync();
+//        final ChannelFuture future = b.connect("139.159.216.99", 7611).sync();
 
     }
 }
