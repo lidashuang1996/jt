@@ -1,10 +1,7 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.actuator.Jtt808T5Actuator;
-import com.lidashuang.jt.actuator.Jtt808T8Actuator;
-import com.lidashuang.jt.jtt808.Jtt808T5;
-import com.lidashuang.jt.jtt808.Jtt808T7;
-import com.lidashuang.jt.jtt808.Jtt808T8;
+import com.lidashuang.jt.actuator.*;
+import com.lidashuang.jt.jtt808.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -14,34 +11,25 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- *
- * 华为云
- * 139.159.216.99
- * root
- * 777nnnnnuuuuuMMMMttt
- *
- * /data/source003
- *
+ * 程序启动的入口
  * @author lidashuang
  * @version 1.0
- *
- * 258 256 3
- * 16 * 16
  */
 @SpringBootApplication
 public class JtApplication {
 
-
     static {
+        JttRegistry.registerMessage(Jtt808T3.M_ID, new Jtt808T3());
         JttRegistry.registerMessage(Jtt808T5.M_ID, new Jtt808T5());
         JttRegistry.registerMessage(Jtt808T7.M_ID, new Jtt808T7());
         JttRegistry.registerMessage(Jtt808T8.M_ID, new Jtt808T8());
+        JttRegistry.registerMessage(Jtt808T18.M_ID, new Jtt808T18());
 
-        // 处理登录消息
-        // 终端注册
+        JttRegistry.registerActuator(Jtt808T3.M_ID, new Jtt808T3Actuator());
         JttRegistry.registerActuator(Jtt808T5.M_ID, new Jtt808T5Actuator());
-        // 终端鉴权
+        JttRegistry.registerActuator(Jtt808T7.M_ID, new Jtt808T7Actuator());
         JttRegistry.registerActuator(Jtt808T8.M_ID, new Jtt808T8Actuator());
+        JttRegistry.registerActuator(Jtt808T18.M_ID, new Jtt808T18Actuator());
     }
 
     public static void main(String[] args) {
