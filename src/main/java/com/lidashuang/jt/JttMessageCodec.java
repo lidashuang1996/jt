@@ -1,6 +1,7 @@
-package com.lidashuang.jt.message;
+package com.lidashuang.jt;
 
 /**
+ * JTT 消息的编码和解码
  * @author lidashuang
  * @version 1.0
  */

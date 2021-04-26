@@ -1,12 +1,10 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.message.JttMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -120,7 +118,7 @@ import java.util.Arrays;
  * @author lidashuang
  * @version 1.0
  */
-public class JtEncoder extends MessageToByteEncoder<JttMessage> {
+public class JttEncoder extends MessageToByteEncoder<JttMessage> {
 
     /** 标记字符 */
     private static final byte MARK = 0x7e;
@@ -130,55 +128,112 @@ public class JtEncoder extends MessageToByteEncoder<JttMessage> {
     private static final byte MARK_T_B1 = 0x02;
     /** 转义字符 模型2*/
     private static final byte MARK_T_B2 = 0x01;
+    /** 最大消息长度 */
+    private static final int MAX_MESSAGE_SIZE = 1024;
     /** 日志对象 */
-    private static final Logger LOGGER = LoggerFactory.getLogger(JtEncoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JttEncoder.class);
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, JttMessage jtMessage, ByteBuf byteBuf) {
-        // 输出的结果
-        byte[] result = new byte[0];
+    @SuppressWarnings("all")
+    protected void encode(ChannelHandlerContext context, JttMessage jttMessage, ByteBuf byteBuf) {
         // 消息编码得到原本数据
-        final byte[] data = jtMessage.encode();
-        LOGGER.info("推送的源数据内容为 ==> " + Arrays.toString(data));
-        // 校验码
-        Integer checkCode = null;
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
-            // 写入开始标记符号
-            outputStream.write(MARK);
-            for (final byte datum : data) {
-                checkCode = checkCode == null ? datum : (checkCode ^ datum);
-                if (datum == MARK) {
-                    outputStream.write(MARK_T);
-                    outputStream.write(MARK_T_B1);
-                } else if (datum == MARK_T) {
-                    outputStream.write(MARK_T);
-                    outputStream.write(MARK_T_B2);
-                } else {
-                    outputStream.write(datum);
+        final JttMessageHeader header = jttMessage.getHeader();
+        // 编码数据得到字节码的数组
+        final byte[] data = JttMessage.afterEncoderHook.execute(header.getEncryption(), jttMessage.encode());
+        if (data.length < MAX_MESSAGE_SIZE) {
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try {
+                final byte[] headerBytes = new JttMessageHeader(
+                        jttMessage.getMid(), 12, data.length,
+                        header.getEncryption(), false,
+                        header.getPhone(), header.getNumber(),
+                        0, 0
+                ).encode();
+                outputStream.write(MARK);
+                // 写入转义且写入验证码的数据
+                encodeTransferredMeaningAndWriteCheckCode(headerBytes, data, outputStream);
+                outputStream.write(MARK);
+                final byte[] result = outputStream.toByteArray();
+                LOGGER.info("[ 发送的数据 ] ===> " + Arrays.toString(result));
+                // 写入返回的字节码数据
+                byteBuf.writeBytes(result);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage());
+                e.printStackTrace();
+            } finally {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-            if (checkCode == null) {
-                LOGGER.error("推送的消息不能为空 ～");
-                throw new RuntimeException("推送的消息不能为空 ～");
-            }
-            // 写入校验码
-            outputStream.write(checkCode);
-            // 写入结尾标记符号
-            outputStream.write(MARK);
-            outputStream.flush();
-            result = outputStream.toByteArray();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+        } else {
+            final int mLength = MAX_MESSAGE_SIZE - 1;
+            // 循环写入数据
+            for (int i = 0; i < ((int) Math.ceil(data.length / mLength)); i++) {
+                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                try {
+                    final JttMessageHeader h = new JttMessageHeader(
+                            jttMessage.getMid(), 16,
+                            Math.min(mLength, (data.length - mLength * i)),
+                            header.getEncryption(), true,
+                            header.getPhone(), header.getNumber(),
+                            ((int) Math.ceil(data.length / mLength)), (i + 1));
+                    final byte[] headerBytes = h.encode();
+                    outputStream.write(MARK);
+                    // 写入转义且写入验证码的数据
+                    encodeTransferredMeaningAndWriteCheckCode(headerBytes,
+                            JttUtils.bytesArrayIntercept(data, mLength * i, h.getContentLength()), outputStream);
+                    outputStream.write(MARK);
+                    final byte[] result = outputStream.toByteArray();
+                    LOGGER.info("[ 发送的数据 ] ===> " + Arrays.toString(result));
+                    // 写入返回的字节码数据
+                    byteBuf.writeBytes(outputStream.toByteArray());
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
-        // 推送数据
-        LOGGER.info("推送的最终数据内容为： " + Arrays.toString(result));
-        byteBuf.writeBytes(result);
+    }
+
+    /**
+     * 编码转义
+     * @param hBytes 头部字节码
+     * @param cBytes 内容字节码
+     * @param outputStream 输入流
+     */
+    private void encodeTransferredMeaningAndWriteCheckCode(byte[] hBytes, byte[] cBytes,
+                                                          ByteArrayOutputStream outputStream) {
+        // 校验码
+        Integer checkCode = null;
+        final byte[] e = new byte[hBytes.length + cBytes.length];
+        // 合并数组
+        System.arraycopy(hBytes, 0, e, 0, hBytes.length);
+        System.arraycopy(cBytes, 0, e, hBytes.length, cBytes.length);
+        // 数组循环
+        for (final byte b : e) {
+            checkCode = checkCode == null ? b : (checkCode ^ b);
+            if (b == MARK) {
+                outputStream.write(MARK_T);
+                outputStream.write(MARK_T_B1);
+            } else if (b == MARK_T) {
+                outputStream.write(MARK_T);
+                outputStream.write(MARK_T_B2);
+            } else {
+                outputStream.write(b);
+            }
+        }
+        if (checkCode == null) {
+            LOGGER.error("推送消息的验证码生成失败 ～");
+            throw new RuntimeException("推送消息的验证码生成失败 ～");
+        }
+        outputStream.write(checkCode);
     }
 }

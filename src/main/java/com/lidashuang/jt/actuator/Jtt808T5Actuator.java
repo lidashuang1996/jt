@@ -1,10 +1,10 @@
 package com.lidashuang.jt.actuator;
 
-import com.lidashuang.jt.JtActuator;
-import com.lidashuang.jt.JtContext;
-import com.lidashuang.jt.message.JttMessage;
+import com.lidashuang.jt.JttActuator;
+import com.lidashuang.jt.JttContext;
+import com.lidashuang.jt.JttMessage;
 import com.lidashuang.jt.JttUtils;
-import com.lidashuang.jt.jt808.Jtt808T6;
+import com.lidashuang.jt.jtt808.Jtt808T6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
  * @author lidashuang
  * @version 1.0
  */
-public class Jt808T5Actuator implements JtActuator {
+public class Jtt808T5Actuator implements JttActuator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Jt808T5Actuator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Jtt808T5Actuator.class);
 
     @Override
-    public void execute(JtContext context, JttMessage message) {
+    public void execute(JttContext context, JttMessage message) {
         // 注册
         LOGGER.info(
                 "[接受到消息] 注册 ==> " + message.toString()

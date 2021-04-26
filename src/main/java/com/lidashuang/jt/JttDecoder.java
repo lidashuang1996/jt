@@ -1,12 +1,12 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.message.JttMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -120,7 +120,7 @@ import java.util.List;
  * @author lidashuang
  * @version 1.0
  */
-public class JtDecoder extends ByteToMessageDecoder {
+public class JttDecoder extends ByteToMessageDecoder {
 
     /** 标记字符 */
     private static final byte MARK = 0x7e;
@@ -131,12 +131,17 @@ public class JtDecoder extends ByteToMessageDecoder {
     /** 转义字符 模型2 */
     private static final byte MARK_T_B2 = 0x01;
     /** 日志对象 */
-    private static final Logger LOGGER = LoggerFactory.getLogger(JtDecoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JttDecoder.class);
+    /** 消息的头部对象 */
+    private static final JttMessageHeader JTT_MESSAGE_HEADER = new JttMessageHeader();
+
+    /** 分包数据保存地方 */
+    private int subcontractMid = 0;
+    private ByteArrayOutputStream subcontractStream = null;
+
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext,
-                          ByteBuf byteBuf, List<Object> list) throws Exception {
-        System.out.println("接收到内容了。。。。。。。。");
+    protected void decode(ChannelHandlerContext context, ByteBuf byteBuf, List<Object> list) throws Exception {
         // 读取数据流
         final byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
@@ -150,7 +155,7 @@ public class JtDecoder extends ByteToMessageDecoder {
      * @return 解析的消息对象
      * @throws Exception 解析出现的异常
      */
-    private static List<JttMessage> jtDecode(byte[] bytes) throws Exception {
+    private List<JttMessage> jtDecode(byte[] bytes) throws Exception {
         // 创建返回的集合对象
         final List<JttMessage> result = new ArrayList<>();
         // 验证一下参数
@@ -172,7 +177,10 @@ public class JtDecoder extends ByteToMessageDecoder {
                     final int dLength = i - index + 1;
                     final byte[] data = new byte[dLength];
                     System.arraycopy(bytes, index, data, 0, dLength);
-                    result.add(jtDecodeByteToMessage(data));
+                    final JttMessage jttMessage = jtDecodeByteToMessage(data);
+                    if (jttMessage != null) {
+                        result.add(jttMessage);
+                    }
                     // 判断一下当前是不收最后一个位置，如果当前不是最后一个位置，说明存在多条消息
                     if (i + 1 < bytes.length) {
                         // 判断一下，下一位是否是 MARK 记号开头
@@ -208,7 +216,7 @@ public class JtDecoder extends ByteToMessageDecoder {
      * @return 解析后的对象
      * @throws Exception 解析过程出现的异常
      */
-    private static JttMessage jtDecodeByteToMessage(byte[] bytes) throws Exception {
+    private JttMessage jtDecodeByteToMessage(byte[] bytes) throws Exception {
         // * 规则定义如下：
         // * 0x7e <————> 0x7d 后紧跟一个 0x02
         // * 0x7d <————> 0x7d 后紧跟一个 0x01
@@ -268,13 +276,67 @@ public class JtDecoder extends ByteToMessageDecoder {
         checkStatus = (checkCode == bytes[bytes.length - eLen]);
         // 校验码是否正确
         if (checkStatus) {
-            // 获取类型
-            final int type = JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(data, 0, 2));
-            LOGGER.info("JT 消息类型 ==> " + type);
-            return JtRegistry.getMessageCore(type).decode(data);
+            // 解析头部字节码内容
+            final JttMessageHeader header = JTT_MESSAGE_HEADER.decode(data);
+            // 判断是否分包
+            if (header.getSubcontract()) {
+                if (header.getSubcontractIndex() == 1) {
+                    // 删除分包的数据
+                    cleanSubcontract();
+                    subcontractMid = header.getId();
+                    subcontractStream = new ByteArrayOutputStream();
+                    subcontractStream.write(JttUtils.bytesArrayIntercept(data,
+                            header.getHeadLength(), data.length - header.getHeadLength()));
+                    return null;
+                } else if (header.getSubcontractIndex() < header.getSubcontractLength()) {
+                    if (subcontractStream != null && subcontractMid == header.getId()) {
+                        subcontractStream.write(JttUtils.bytesArrayIntercept(data,
+                                header.getHeadLength(), data.length - header.getHeadLength()));
+                        return null;
+                    } else {
+                        LOGGER.error("JT 消息分包数据异常 ～ @1");
+                        throw new Exception("JT 消息分包数据异常 ～ @1");
+                    }
+                } else {
+                    if (subcontractStream != null && subcontractMid == header.getId()) {
+                        final JttMessage jttMessage = JttRegistry.getMessageCore(header.getId()).decode(
+                                JttMessage.beforeDecoderHook.execute(header.getEncryption(), subcontractStream.toByteArray()));
+                        jttMessage.setHeader(header);
+                        return jttMessage;
+                    } else {
+                        LOGGER.error("JT 消息分包数据异常 ～ @2");
+                        throw new Exception("JT 消息分包数据异常 ～ @2");
+                    }
+                }
+            } else {
+                // 如果获取正常的数据，就删除分包的数据
+                cleanSubcontract();
+                // 去注册中心查询对应的消息处理器，进行解码操作
+                final JttMessage jttMessage = JttRegistry.getMessageCore(header.getId()).decode(
+                        JttMessage.beforeDecoderHook.execute(header.getEncryption(), JttUtils.bytesArrayIntercept(
+                                data, header.getHeadLength(), data.length - header.getHeadLength())));
+                jttMessage.setHeader(header);
+                return jttMessage;
+            }
         } else {
             LOGGER.error("JT 消息校验码异常 ～ ");
             throw new Exception("JT 消息校验码异常 ～");
+        }
+    }
+
+    /**
+     * 清除分包数据
+     */
+    private void cleanSubcontract() {
+        if (subcontractStream != null) {
+            try {
+                subcontractStream.flush();
+                subcontractStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                subcontractStream = null;
+            }
         }
     }
 }

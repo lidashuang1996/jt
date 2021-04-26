@@ -108,8 +108,16 @@ public final class JttUtils {
         return (byte) Integer.parseInt(data, 2);
     }
 
-    public static String byteTo8421Code(byte bytes) {
-        return String.valueOf(bytes >> 4 & 0x0F) + (bytes & 0x0F);
+    public static String byteTo8421Code(byte b) {
+        return String.valueOf(b >> 4 & 0x0F) + (b & 0x0F);
+    }
+
+    public static String bytesTo8421Code(byte[] bytes) {
+        final StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(byteTo8421Code(b));
+        }
+        return sb.toString();
     }
 
     public static byte[] codeTo8421Bytes(String content) {

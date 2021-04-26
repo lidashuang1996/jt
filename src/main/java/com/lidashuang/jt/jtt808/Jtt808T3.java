@@ -1,13 +1,13 @@
-package com.lidashuang.jt.jt808;
+package com.lidashuang.jt.jtt808;
 
-import com.lidashuang.jt.message.JttMessage;
+import com.lidashuang.jt.JttMessage;
 import java.util.Arrays;
 
 /**
  *
  * 数据格式
  *
- * 平台通用应答
+ * 终端心跳
  * 消息 ID:0x0002
  *
  * 终端心跳数据消息体为空。

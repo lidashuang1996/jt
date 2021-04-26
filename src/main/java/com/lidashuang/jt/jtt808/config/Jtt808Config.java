@@ -1,4 +1,4 @@
-package com.lidashuang.jt.jt808.config;
+package com.lidashuang.jt.jtt808.config;
 
 import java.util.ArrayList;
 import java.util.List;

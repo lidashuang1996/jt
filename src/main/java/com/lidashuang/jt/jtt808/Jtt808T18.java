@@ -1,7 +1,10 @@
-package com.lidashuang.jt.jt808;
+package com.lidashuang.jt.jtt808;
 
-import com.lidashuang.jt.message.JttMessage;
+import com.lidashuang.jt.JttUtils;
+import com.lidashuang.jt.JttMessage;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -27,7 +30,7 @@ import java.util.Arrays;
  * 16       高程      WORD         海拔高度，单位为米(m)
  * 18       速度      WORD         1/10km/h
  * 20       方向      WORD         0-359，正北为 0，顺时针
- * 21       时间      BCD[6]       YY-MM-DD-hh-mm-ss(GMT+8 时间，本标准中之后涉及的时间均采用此时区)
+ * 22       时间      BCD[6]       YY-MM-DD-hh-mm-ss(GMT+8 时间，本标准中之后涉及的时间均采用此时区)
  *
  *
  * 报警标志位定义
@@ -139,25 +142,22 @@ import java.util.Arrays;
  *
  * 扩展车辆信号状态位
  * 位        定义
- * 0
- * 1
- * 2
- * 3
- * 4
- * 5
- * 6
- * 7
- * 8
- * 9 10 11 12 13 14 15-31
- * 路段ID
- * 路段行驶时间
- * 结果
- * DWORD
- * WORD 单位为秒(s)
- * BYTE 0:不足;1:过长
- * 表 31 扩展车辆信号状态位 定义
- *            1:近光灯信号 1:远光灯信号 1:右转向灯信号 1:左转向灯信号 1:制动信号 1:倒档信号 1:雾灯信号 1:示廓灯 1:喇叭信号 1:空调状态 1:空挡信号 1:缓速器工作 1:ABS 工作 1:加热器工作 1:离合器状态 保留
- *
+ * 0         1:近光灯信号
+ * 1         1:远光灯信号
+ * 2         1:右转向灯信号
+ * 3         1:左转向灯信号
+ * 4         1:制动信号
+ * 5         1:倒档信号
+ * 6         1:雾灯信号
+ * 7         1:示廓灯
+ * 8         1:喇叭信号
+ * 9         1:空调状态
+ * 10        1:空挡信号
+ * 11        1:缓速器工作
+ * 12        1:ABS 工作
+ * 13        1:加热器工作
+ * 14        1:离合器状态
+ * 15-31     保留
  *
  *
  *
@@ -175,11 +175,53 @@ import java.util.Arrays;
 public class Jtt808T18 extends JttMessage {
 
     /** 消息 ID */
-    public final static int M_ID = 0x0000;
+    public final static int M_ID = 0x0200;
+
+    /** 报警标记 */
+    private byte[] alarmMark;
+    /** 状态 */
+    private byte[] status;
+    /** 纬度 */
+    private int latitude;
+    /** 经度 */
+    private int longitude;
+    /** 高度 */
+    private int height;
+    /** 速度 */
+    private int speed;
+    /** 方向 */
+    private int direction;
+    /** 时间 */
+    private String datetime;
+    /** 扩展信息 */
+    private byte[] extend;
 
     public Jtt808T18() {}
 
-    public Jtt808T18(byte[] bytes) {
+    public Jtt808T18(byte[] alarmMark, byte[] status, int latitude, int longitude,
+                     int height, int speed, int direction, String datetime, byte[] extend) {
+        this.alarmMark = alarmMark;
+        this.status = status;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.height = height;
+        this.speed = speed;
+        this.direction = direction;
+        this.datetime = datetime;
+        this.extend = extend;
+    }
+
+    public Jtt808T18(byte[] alarmMark, byte[] status, int latitude, int longitude,
+                     int height, int speed, int direction, String datetime, byte[] extend, byte[] bytes) {
+        this.alarmMark = alarmMark;
+        this.status = status;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.height = height;
+        this.speed = speed;
+        this.direction = direction;
+        this.datetime = datetime;
+        this.extend = extend;
         this.bytes = bytes;
     }
 
@@ -188,20 +230,66 @@ public class Jtt808T18 extends JttMessage {
         return M_ID;
     }
 
+    /**
+     *  * 起始字节  字段      数据类型      描述及要求
+     *  * 0        报警标志   DWORD        报警标志位定义见 [报警标志位定义]
+     *  * 4        状态      DWORD        状态位定义见 [状态位定义见]
+     *  * 8        纬度      DWORD        以度为单位的纬度值乘以10的6次方，精确到百万分之一度
+     *  * 12       经度      DWORD        以度为单位的经度值乘以10的6次方，精确到百万分之一度
+     *  * 16       高程      WORD         海拔高度，单位为米(m)
+     *  * 18       速度      WORD         1/10km/h
+     *  * 20       方向      WORD         0-359，正北为 0，顺时针
+     *  * 22       时间      BCD[6]       YY-MM-DD-hh-mm-ss(GMT+8 时间，本标准中之后涉及的时间均采用此时区)
+     * @param bytes 解码的参数
+     * @return
+     */
     @Override
     @SuppressWarnings("all")
     public byte[] encode() {
+        ByteArrayOutputStream outputStream = null;
         try {
+            outputStream = new ByteArrayOutputStream();
+            outputStream.write(alarmMark);
+            outputStream.write(status);
+            outputStream.write(JttUtils.intToBytesBig(latitude));
+            outputStream.write(JttUtils.intToBytesBig(longitude));
+            outputStream.write(JttUtils.integerToHigh8Low8(height));
+            outputStream.write(JttUtils.integerToHigh8Low8(speed));
+            outputStream.write(JttUtils.integerToHigh8Low8(direction));
+            outputStream.write(JttUtils.codeTo8421Bytes(datetime));
+            if (extend != null && extend.length > 0) {
+                outputStream.write(extend);
+            }
+            this.bytes = outputStream.toByteArray();
             return this.bytes;
         } catch (Exception e) {
             throw new RuntimeException("[ Jtt808T0 ] encode() ==> " + e);
+        } finally {
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     @Override
     public Jtt808T18 decode(byte[] bytes) {
         try {
-            return new Jtt808T18(bytes);
+            return new Jtt808T18(
+                    JttUtils.bytesArrayIntercept(bytes, 0, 4),
+                    JttUtils.bytesArrayIntercept(bytes, 4, 4),
+                    JttUtils.bytesToIntBig(JttUtils.bytesArrayIntercept(bytes, 8, 4)),
+                    JttUtils.bytesToIntBig(JttUtils.bytesArrayIntercept(bytes, 12, 4)),
+                    JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(bytes, 16, 2)),
+                    JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(bytes, 18, 2)),
+                    JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(bytes, 20, 2)),
+                    JttUtils.bytesTo8421Code(JttUtils.bytesArrayIntercept(bytes, 22, 6)),
+                    JttUtils.bytesArrayIntercept(bytes, 28, bytes.length - 28),
+                    bytes
+            );
         } catch (Exception e) {
             throw new RuntimeException("[ Jtt808T0 ] decode() ==> " + e);
         }
@@ -210,10 +298,62 @@ public class Jtt808T18 extends JttMessage {
     @Override
     public String toString() {
         return "{"
-                + "\"bytes\":"
+                + "\"alarmMark\":"
+                + Arrays.toString(alarmMark)
+                + ",\"status\":"
+                + Arrays.toString(status)
+                + ",\"latitude\":"
+                + latitude
+                + ",\"longitude\":"
+                + longitude
+                + ",\"height\":"
+                + height
+                + ",\"speed\":"
+                + speed
+                + ",\"direction\":"
+                + direction
+                + ",\"datetime\":\""
+                + datetime + '\"'
+                + ",\"extend\":"
+                + Arrays.toString(extend)
+                + ",\"bytes\":"
                 + Arrays.toString(bytes)
                 + "}";
     }
 
+    public byte[] getAlarmMark() {
+        return alarmMark;
+    }
 
+    public byte[] getStatus() {
+        return status;
+    }
+
+    public int getLatitude() {
+        return latitude;
+    }
+
+    public int getLongitude() {
+        return longitude;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public String getDatetime() {
+        return datetime;
+    }
+
+    public byte[] getExtend() {
+        return extend;
+    }
 }

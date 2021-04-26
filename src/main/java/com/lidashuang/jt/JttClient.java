@@ -1,6 +1,6 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.jt808.Jtt808T6;
+import com.lidashuang.jt.jtt808.Jtt808T6;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -15,10 +15,10 @@ import java.util.Arrays;
  * @author lidashuang
  * @version 1.0
  */
-public class JtClient {
+public class JttClient {
     public static void main(String[] args) throws InterruptedException {
         // 终端注册
-        JtRegistry.registerJtMessage(Jtt808T6.M_ID, new Jtt808T6());
+        JttRegistry.registerMessage(Jtt808T6.M_ID, new Jtt808T6());
 
 
         final EventLoopGroup group = new NioEventLoopGroup();
@@ -29,7 +29,7 @@ public class JtClient {
                     public void initChannel(SocketChannel ch) throws Exception {
                         System.out.println("正在连接中...");
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new JtDecoder());
+                        pipeline.addLast(new JttDecoder());
                         pipeline.addLast(new ChannelInboundHandler() {
                             @Override
                             public void channelRegistered(ChannelHandlerContext channelHandlerContext) throws Exception {

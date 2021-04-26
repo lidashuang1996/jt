@@ -1,6 +1,6 @@
-package com.lidashuang.jt.jt808;
+package com.lidashuang.jt.jtt808;
 
-import com.lidashuang.jt.message.JttMessage;
+import com.lidashuang.jt.JttMessage;
 import com.lidashuang.jt.JttUtils;
 
 import java.io.ByteArrayOutputStream;

@@ -1,7 +1,7 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.jt808.Jt808T0;
-import com.lidashuang.jt.message.JttMessage;
+import com.lidashuang.jt.actuator.JttGlobalActuator;
+import com.lidashuang.jt.jtt808.Jtt808T0;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,11 +13,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author lidashuang
  * @version 1.0
  */
-public final class JtRegistry {
+public final class JttRegistry {
 
+    /**
+     * 同步 / 异步
+     */
     public static final String SYNC = "SYNC";
     public static final String ASYNC = "ASYNC";
 
+    /**
+     * 默认的参数内容
+     */
     private static final String DEFAULT_NAME = "__DEFAULT__";
 
     /** sync async // 同步 异步 */
@@ -27,7 +33,7 @@ public final class JtRegistry {
     private static final Map<String, JttMessage> MESSAGE_CORE = new HashMap<>();
 
     /** 处理核心 */
-    private static final Map<String, JtActuator> ACTUATOR_CORE = new HashMap<>();
+    private static final Map<String, JttActuator> ACTUATOR_CORE = new HashMap<>();
 
     /** 处理线程池 */
     private static ThreadPoolExecutor THREAD_POOL = new ThreadPoolExecutor(5,
@@ -35,9 +41,9 @@ public final class JtRegistry {
 
     static {
         /* 设置默认的消息核心 */
-        MESSAGE_CORE.put(DEFAULT_NAME, new Jt808T0());
+        MESSAGE_CORE.put(DEFAULT_NAME, new Jtt808T0());
         /* 设置默认的处理器核心 */
-        ACTUATOR_CORE.put(DEFAULT_NAME, new JtGlobalDefaultActuator());
+        ACTUATOR_CORE.put(DEFAULT_NAME, new JttGlobalActuator());
     }
 
     /**
@@ -58,8 +64,8 @@ public final class JtRegistry {
      * @param key 消息的状态
      * @return 消息的处理器
      */
-    public static JtActuator getActuatorCore(int key) {
-        JtActuator actuator = ACTUATOR_CORE.get(String.valueOf(key));
+    public static JttActuator getActuatorCore(int key) {
+        JttActuator actuator = ACTUATOR_CORE.get(String.valueOf(key));
         if (actuator == null) {
             actuator = ACTUATOR_CORE.get(DEFAULT_NAME);
         }
@@ -102,7 +108,7 @@ public final class JtRegistry {
      */
     public static void setMode(String mode) {
         if (mode != null) {
-            MODE = ASYNC.equals(mode.toUpperCase()) ? ASYNC : SYNC;
+            MODE = ASYNC.equalsIgnoreCase(mode) ? ASYNC : SYNC;
             if (SYNC.equals(MODE)) {
                 shutdownThreadPool();
             } else {
@@ -120,11 +126,21 @@ public final class JtRegistry {
         return MODE;
     }
 
-    public synchronized static void registerJtMessage(int key, JttMessage value) {
+    /**
+     * 注册一个消息
+     * @param key 消息 KEY
+     * @param value 消息 VALUE
+     */
+    public synchronized static void registerMessage(int key, JttMessage value) {
         MESSAGE_CORE.put(String.valueOf(key), value);
     }
 
-    public synchronized static void registerActuator(int key, JtActuator value) {
+    /**
+     * 注册一个处理器
+     * @param key 消息 KEY
+     * @param value 消息 VALUE
+     */
+    public synchronized static void registerActuator(int key, JttActuator value) {
         ACTUATOR_CORE.put(String.valueOf(key), value);
     }
 

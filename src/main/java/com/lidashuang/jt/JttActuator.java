@@ -1,19 +1,17 @@
 package com.lidashuang.jt;
 
-import com.lidashuang.jt.message.JttMessage;
-
 /**
  * 处理器
  * @author lidashuang
  * @version 1.0
  */
-public interface JtActuator {
+public interface JttActuator {
 
     /**
      * 收到消息后执行的方法
      * @param context Netty 上下文对象
      * @param message Jt 消息对象
      */
-    public void execute(JtContext context, JttMessage message);
+    public void execute(JttContext context, JttMessage message);
 
 }
