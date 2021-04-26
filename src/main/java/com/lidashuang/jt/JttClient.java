@@ -1,0 +1,115 @@
+package com.lidashuang.jt;
+
+import com.lidashuang.jt.jtt808.Jtt808T6;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+
+import java.util.Arrays;
+
+/**
+ * @author lidashuang
+ * @version 1.0
+ */
+public class JttClient {
+    public static void main(String[] args) throws InterruptedException {
+        // 终端注册
+        JttRegistry.registerMessage(Jtt808T6.M_ID, new Jtt808T6());
+
+
+        final EventLoopGroup group = new NioEventLoopGroup();
+        Bootstrap b = new Bootstrap();
+        b.group(group).channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) throws Exception {
+                        System.out.println("正在连接中...");
+                        ChannelPipeline pipeline = ch.pipeline();
+                        pipeline.addLast(new JttDecoder());
+                        pipeline.addLast(new ChannelInboundHandler() {
+                            @Override
+                            public void channelRegistered(ChannelHandlerContext channelHandlerContext) throws Exception {
+                                System.out.println("channelRegistered");
+                            }
+
+                            @Override
+                            public void channelUnregistered(ChannelHandlerContext channelHandlerContext) throws Exception {
+                                System.out.println("channelUnregistered");
+                            }
+
+                            @Override
+                            public void channelActive(ChannelHandlerContext channelHandlerContext) throws Exception {
+                                System.out.println("channelActive");
+
+                                byte[] bytes = new byte[] {
+                                        126, 1, 0, 0, 54, 0, 4, 121, 55, 83, 41, 17, -127, 0, 0, 0, 0, 0, 0, 3, 32, 125, 1, 72, 68, 67, 84, 77, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 57, 50, 65, 70, 69, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, 126
+                                };
+// 1, 0,   0, 35,    0, 0, 0, 0, 0, 0, 1, 1,
+//                                byte[] bytes = new byte[] {
+//                                        126, 1, 0, 0, 35, 0, 0, 0, 0, 0, 0, 2, 1, 2, 1, 0, 50, 54, 67, 52, 52, 70, 55, 56, 49, 51, 52, 68, 52, 48, 65, 53, 56, 48, 53, 55, 70, 49, 55, 54, 49, 49, 56, 53, 55, 67, 67, 69, 45, 126
+//                                };
+                                System.out.println(Arrays.toString(bytes));
+                                channelHandlerContext.writeAndFlush(Unpooled.copiedBuffer(bytes));
+                            }
+
+                            @Override
+                            public void channelInactive(ChannelHandlerContext channelHandlerContext) throws Exception {
+                                System.out.println("channelInactive");
+                            }
+
+                            @Override
+                            public void channelRead(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
+                                if (o instanceof Jtt808T6) {
+                                    System.out.println(o.toString());
+                                } else if (o instanceof ByteBuf) {
+                                    // 读取数据流
+                                    ByteBuf byteBuf = (ByteBuf) o;
+                                    final byte[] bytes = new byte[byteBuf.readableBytes()];
+                                    byteBuf.readBytes(bytes);
+                                    System.out.println("收到  " + Arrays.toString(bytes));
+                                }
+                            }
+
+                            @Override
+                            public void channelReadComplete(ChannelHandlerContext channelHandlerContext) throws Exception {
+                                System.out.println("channelReadComplete");
+                            }
+
+                            @Override
+                            public void userEventTriggered(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
+                                System.out.println("userEventTriggered");
+                            }
+
+                            @Override
+                            public void channelWritabilityChanged(ChannelHandlerContext channelHandlerContext) throws Exception {
+                                System.out.println("channelWritabilityChanged");
+                            }
+
+                            @Override
+                            public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable throwable) throws Exception {
+                                System.out.println("exceptionCaught");
+                            }
+
+                            @Override
+                            public void handlerAdded(ChannelHandlerContext channelHandlerContext) throws Exception {
+                                System.out.println("handlerAdded");
+                            }
+
+                            @Override
+                            public void handlerRemoved(ChannelHandlerContext channelHandlerContext) throws Exception {
+                                System.out.println("handlerRemoved");
+                            }
+                        });
+
+                    }
+                });
+        //发起异步连接请求，绑定连接端口和host信息  139.159.216.99
+         final ChannelFuture future = b.connect("127.0.0.1", 7611).sync();
+//        final ChannelFuture future = b.connect("139.159.216.99", 7611).sync();
+
+    }
+}

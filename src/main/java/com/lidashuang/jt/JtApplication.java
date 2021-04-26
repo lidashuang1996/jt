@@ -1,32 +1,39 @@
 package com.lidashuang.jt;
 
+import com.lidashuang.jt.actuator.*;
+import com.lidashuang.jt.jtt808.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- *
- * 华为云
- * 139.159.216.99
- * root
- * 777nnnnnuuuuuMMMMttt
- *
- * /data/source003
- *
+ * 程序启动的入口
  * @author lidashuang
  * @version 1.0
- *
- * 258 256 3
- * 16 * 16
  */
 @SpringBootApplication
 public class JtApplication {
 
+    static {
+        JttRegistry.registerMessage(Jtt808T3.M_ID, new Jtt808T3());
+        JttRegistry.registerMessage(Jtt808T5.M_ID, new Jtt808T5());
+        JttRegistry.registerMessage(Jtt808T7.M_ID, new Jtt808T7());
+        JttRegistry.registerMessage(Jtt808T8.M_ID, new Jtt808T8());
+        JttRegistry.registerMessage(Jtt808T18.M_ID, new Jtt808T18());
+
+        JttRegistry.registerActuator(Jtt808T3.M_ID, new Jtt808T3Actuator());
+        JttRegistry.registerActuator(Jtt808T5.M_ID, new Jtt808T5Actuator());
+        JttRegistry.registerActuator(Jtt808T7.M_ID, new Jtt808T7Actuator());
+        JttRegistry.registerActuator(Jtt808T8.M_ID, new Jtt808T8Actuator());
+        JttRegistry.registerActuator(Jtt808T18.M_ID, new Jtt808T18Actuator());
+    }
+
     public static void main(String[] args) {
-        // SpringApplication.run(JtApplication.class, args);
+        SpringApplication.run(JtApplication.class, args);
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
         // Worker线程
         final EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -44,14 +51,14 @@ public class JtApplication {
                         protected void initChannel(SocketChannel channel) {
                             // 管道中添加处理器
                             channel.pipeline()
-                                    .addLast(new JtDecoder())
-                                    .addLast(new JtHandler())
-                                    .addLast(new JtEncoder());
+                                    .addLast(new JttDecoder())
+                                    .addLast(new JttEncoder())
+                                    .addLast(new JttHandler());
                         }
-                    })
-                    .option(ChannelOption.SO_BROADCAST, true)
-                    .option(ChannelOption.SO_RCVBUF, 2048 * 1024)
-                    .option(ChannelOption.SO_SNDBUF, 1024 * 1024);
+                    });
+//                    .option(ChannelOption.SO_BROADCAST, true)
+//                    .option(ChannelOption.SO_RCVBUF, 2048 * 1024)
+//                    .option(ChannelOption.SO_SNDBUF, 1024 * 1024);
             // 启动服务器
             final ChannelFuture channelFuture = server.bind(7611).sync();
             channelFuture.channel().closeFuture().sync();
