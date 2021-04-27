@@ -35,9 +35,10 @@ public class JttContext {
 
     /**
      * 推送消息对象
+     * 不能同时推送消息，只能一条条发送消息
      * @param message 消息对象
      */
-    public void sendMessage(JttMessage message) {
+    public synchronized void sendMessage(JttMessage message) {
         if (context != null) {
             final Channel channel = context.channel();
             if (channel != null) {
