@@ -176,6 +176,79 @@ public class Jtt808T18 extends JttMessage {
 
     /** 消息 ID */
     public final static int M_ID = 0x0200;
+    private final static int MARK_LENGTH = 4;
+    private final static int STATUS_LENGTH = 4;
+
+    private final static String[] MARK_CONTENT = new String[] {
+            "紧急报警，触动报警开关后触发(收到应答后清零)",
+            "超速报警(标志维持至报警条件解除)",
+            "疲劳驾驶(标志维持至报警条件解除)",
+            "危险预警(收到应答后清零)",
+            "GNSS 模块发生故障(标志维持至报警条件解除)",
+            "GNSS 天线未接或被剪断(标志维持至报警条件解除)",
+            "GNSS 天线短路(标志维持至报警条件解除)",
+            "终端主电源欠压(标志维持至报警条件解除)",
+            "终端主电源掉电(标志维持至报警条件解除)",
+            "终端 LCD 或显示器故障(标志维持至报警条件解除)",
+            "TTS 模块故障(标志维持至报警条件解除)",
+            "摄像头故障(标志维持至报警条件解除)",
+            "道路运输证 IC 卡模块故障(标志维持至报警条件解除)",
+            "超速预警(标志维持至报警条件解除)",
+            "疲劳驾驶预警(标志维持至报警条件解除)",
+            "{保留}",
+            "{保留}",
+            "{保留}",
+            "当天累计驾驶超时(标志维持至报警条件解除)",
+            "超时停车(标志维持至报警条件解除)",
+            "进出区域(收到应答后清零)",
+            "进出路线(收到应答后清零)",
+            "路段行驶时间不足/过长 (收到应答后清零)",
+            "路线偏离报警(标志维持至报警条件解除)",
+            "车辆 VSS 故障    (标志维持至报警条件解除)",
+            "车辆油量异常(标志维持至报警条件解除)",
+            "车辆被盗(通过车辆防盗器)  (标志维持至报警条件解除)",
+            "车辆非法点火(收到应答后清零)",
+            "车辆非法位移(收到应答后清零)",
+            "碰撞预警(标志维持至报警条件解除)",
+            "侧翻预警(标志维持至报警条件解除)",
+            "非法开门报警(终端未设置区域时，不判断非法开门)(收到应答后清零)",
+    };
+
+    private final static String[] STATUS_CONTENT = new String[] {
+            "ACC 关_ACC 开",
+            "未定位_定位",
+            "北纬_南纬",
+            "东经_西经",
+            "运营状态_停运状态",
+            "经纬度未经保密插件加密_经纬度已经保密插件加密",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "空车_半载_保留_满载",
+            "空车_半载_保留_满载",
+            "车辆油路正常_车辆油路断开",
+            "车辆电路正常_车辆电路断开",
+            "车门解锁_车门加锁",
+            "门 关(前门)_门 开(前门)",
+            "门 关(中门)_门 开(中门)",
+            "门 关(后门)_门 开(后门)",
+            "门 关(驾驶席门)_门 开(驾驶席门)",
+            "门 关(自定义)_门 开(自定义)",
+            "未使用 GPS 卫星进行定位_使用 GPS 卫星进行定位",
+            "未使用北斗卫星进行定位_使用北斗卫星进行定位",
+            "未使用 GLONASS 卫星进行定位_使用 GLONASS 卫星进行定位",
+            "未使用 Galileo 卫星进行定位_使用 Galileo 卫星进行定位",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}",
+            "{保留}_{保留}"
+    };
 
     /** 报警标记 */
     private byte[] alarmMark;
@@ -195,6 +268,53 @@ public class Jtt808T18 extends JttMessage {
     private String datetime;
     /** 扩展信息 */
     private byte[] extend;
+
+    /**
+     * 解析报警标记
+     * @return 分析之后的内容
+     */
+    public static String analyseMark(byte[] bytes) {
+        if (bytes != null && bytes.length == MARK_LENGTH) {
+            final StringBuilder sb = new StringBuilder();
+            final String c = JttUtils.integerToBinaryString(JttUtils.bytesToIntBig(bytes), 32);
+            for (int i = 0; i < c.length(); i++) {
+                if (c.charAt(i) == '1') {
+                    sb.append(MARK_CONTENT[i]).append(",");
+                }
+            }
+            final String s = sb.toString();
+            return s.length() > 0 ? s.substring(0, s.length() - 1) : "";
+        } else {
+            return "[ MARK 解析失败 ]";
+        }
+    }
+
+    /**
+     * 解析状态
+     * @return 分析之后的内容
+     */
+    public static String analyseStatus(byte[] bytes) {
+        if (bytes != null && bytes.length == STATUS_LENGTH) {
+            final StringBuilder sb = new StringBuilder();
+            final String c = JttUtils.integerToBinaryString(JttUtils.bytesToIntBig(bytes), 32);
+            for (int i = 0; i < c.length(); i++) {
+                if (i == 8 || i == 9) {
+                    if (i == 9) {
+                        final int v = Integer.parseInt(String.valueOf(c.charAt(8)))
+                                + Integer.parseInt(String.valueOf(c.charAt(9))) * 2;
+                        sb.append(STATUS_CONTENT[9].split("_")[v]).append(",");
+                    }
+                } else {
+                    final int v = Integer.parseInt(String.valueOf(c.charAt(i)));
+                    sb.append(STATUS_CONTENT[i].split("_")[v]).append(",");
+                }
+            }
+            final String s = sb.toString();
+            return s.length() > 0 ? s.substring(0, s.length() - 1) : "";
+        } else {
+            return "[ STATUS 解析失败 ]";
+        }
+    }
 
     public Jtt808T18() {}
 
@@ -299,9 +419,9 @@ public class Jtt808T18 extends JttMessage {
     public String toString() {
         return "{"
                 + "\"alarmMark\":"
-                + Arrays.toString(alarmMark)
+                + analyseMark(alarmMark)
                 + ",\"status\":"
-                + Arrays.toString(status)
+                + analyseStatus(status)
                 + ",\"latitude\":"
                 + latitude
                 + ",\"longitude\":"
