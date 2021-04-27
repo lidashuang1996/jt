@@ -318,10 +318,11 @@ public class JttDecoder extends ByteToMessageDecoder {
                         JttMessage.beforeDecoderHook.execute(header.getEncryption(), JttUtils.bytesArrayIntercept(
                                 data, header.getHeadLength(), data.length - header.getHeadLength())));
                 jttMessage.setHeader(header);
+                LOGGER.info("[ 接收的数据 ] (消息对象) ==> HEADER: " + header + " MESSAGE: " + jttMessage);
                 return jttMessage;
             }
         } else {
-            LOGGER.error("JT 消息校验码异常 ～ ");
+            LOGGER.error("JT 消息校验码异常 ～");
             throw new Exception("JT 消息校验码异常 ～");
         }
     }

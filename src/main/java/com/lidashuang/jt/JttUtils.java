@@ -28,17 +28,33 @@ import java.util.zip.Inflater;
 public final class JttUtils {
 
     public static void main(String[] args) {
-        System.out.println( Integer.toBinaryString(33024));
-        System.out.println(new String(new byte[] {
-                0, 3, 0, 0, 39, 32, 22, 99, 64, 35, 2, -105
-        }));
+        System.out.println((char) 125);
+        System.out.println((char) 126);
+        byte[] bytes = new byte[] {
+                1, 2, 0, 17, 39, 32, 22, 99, 64, 35, 8, 127, 51, 52, 51, 55, 48, 68, 56, 56, 55, 66, 68, 55, 52, 57, 52, 66, 0, 125, 2, 126
+        };
+        Integer t = null;
+        for (byte b : bytes) {
+            t = t == null ? b : t ^ b;
+        }
+        System.out.println(t);
     }
+
     /**
      * 生成 UUID
      */
-    public static String generateUUID() {
+    public static String generateUuid() {
         return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
+
+    public static String generateUuid(int len) {
+        final StringBuilder sb = new StringBuilder(generateUuid());
+        for (int i = sb.length(); i < len; i++) {
+            sb.append("0");
+        }
+        return sb.toString().substring(0, len);
+    }
+
 
     /**
      * 以大端模式将 int 转成 byte[]

@@ -1,47 +1,12 @@
- JT 消息类型 ==> 3
-2021-04-17 18:16:46.597  WARN 24116 --- [ntLoopGroup-3-1] io.netty.channel.DefaultChannelPipeline  : An exceptionCaught() event was fired, and it reached at the tail of the pipeline. It usually means the last handler in the pipeline did not handle the exception.
-
-io.netty.handler.codec.DecoderException: java.lang.RuntimeException: java.lang.Exception: 消息内容理论为空，现在存在内容, 内容为 ==> [0, 3, 0, 0, 39, 32, 22, 99, 64, 35, 2, -105]
-        at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:478) ~[netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:276) ~[netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:365) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:357) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1410) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:379) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.AbstractChannelHandlerContext.invokeChannelRead(AbstractChannelHandlerContext.java:365) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:919) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:166) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:719) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:655) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:581) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:493) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:989) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) [netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at java.lang.Thread.run(Thread.java:748) [na:1.8.0_221]
-Caused by: java.lang.RuntimeException: java.lang.Exception: 消息内容理论为空，现在存在内容, 内容为 ==> [0, 3, 0, 0, 39, 32, 22, 99, 64, 35, 2, -105]
-        at com.lidashuang.jt.jt808.Jt808T7.decode(Jt808T7.java:36) ~[classes!/:0.0.1-SNAPSHOT]
-        at com.lidashuang.jt.JtDecoder.jtDecodeByteToMessage(JtDecoder.java:272) ~[classes!/:0.0.1-SNAPSHOT]
-        at com.lidashuang.jt.JtDecoder.jtDecode(JtDecoder.java:173) ~[classes!/:0.0.1-SNAPSHOT]
-        at com.lidashuang.jt.JtDecoder.decode(JtDecoder.java:142) ~[classes!/:0.0.1-SNAPSHOT]
-        at io.netty.handler.codec.ByteToMessageDecoder.decodeRemovalReentryProtection(ByteToMessageDecoder.java:508) ~[netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:447) ~[netty-all-4.1.60.Final.jar!/:4.1.60.Final]
-        ... 17 common frames omitted
-Caused by: java.lang.Exception: 消息内容理论为空，现在存在内容, 内容为 ==> [0, 3, 0, 0, 39, 32, 22, 99, 64, 35, 2, -105]
-        at com.lidashuang.jt.jt808.Jt808T7.decode(Jt808T7.java:32) ~[classes!/:0.0.1-SNAPSHOT]
-        ... 22 common frames omitted
-
-
-
-
-
-{"number":673,"result":0,"authCode":"26C44F78134D40A58057F17611857CCE","header":null}
-2021-04-17 18:35:40.219  INFO 5568 --- [ntLoopGroup-3-1] com.lidashuang.jt.JtEncoder              : 推送的源数据内容为 ==>
-
-
-[1, 0, 0, 35, 0, 0, 0, 0, 0, 0, 2, 1, 2, 1, 0, 50, 54, 67, 52, 52, 70, 55, 56, 49, 51, 52, 68, 52, 48, 65, 53, 56, 48, 53, 55, 70, 49, 55, 54, 49, 49, 56, 53, 55, 67, 67, 69]
-
-
-
-
+[ 接收的数据 ] ===> [126, 1, 2, 0, 17, 39, 32, 22, 99, 64, 35, 9, 44, 67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0, 90, 126]
+2021-04-27 09:30:48 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttDecoder - [ 接收的数据 ] (消息对象) ==> HEADER: {"id":258,"headLength":12,"contentLength":17,"encryption":0,"subcontract":false,"phone":"272016634023","number":2348,"subcontractLength":0,"subcontractIndex":0} MESSAGE: {"authCode":"C80560CA20D34DFE","bytes":[67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0]}
+2021-04-27 09:30:48 [actuator-pool-1-thread-1] INFO  com.lidashuang.jt.actuator.Jtt808T8Actuator - [ 接收到「鉴权」] ==> {"authCode":"C80560CA20D34DFE","bytes":[67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0]}
+2021-04-27 09:30:48 [actuator-pool-1-thread-1] INFO  com.lidashuang.jt.actuator.Jtt808T8Actuator - [ 应答到「鉴权」 ] ==> {"answerNumber":2348,"answerId":0,"result":0,"bytes":null}
+2021-04-27 09:30:48 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttEncoder - [ 发送的数据 ] (消息对象) ==> HEADER: {"id":32769,"headLength":12,"contentLength":5,"encryption":0,"subcontract":false,"phone":"272016634023","number":1,"subcontractLength":0,"subcontractIndex":0} MESSAGE: {"answerNumber":2348,"answerId":0,"result":0,"bytes":[9, 44, 0, 0, 0]}
+2021-04-27 09:30:48 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttEncoder - [ 发送的数据 ] ===> [126, -128, 1, 0, 5, 39, 32, 22, 99, 64, 35, 0, 1, 9, 44, 0, 0, 0, -79, 126]
+2021-04-27 09:31:03 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttDecoder - [ 接收的数据 ] ===> [126, 1, 2, 0, 17, 39, 32, 22, 99, 64, 35, 9, 45, 67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0, 91, 126]
+2021-04-27 09:31:03 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttDecoder - [ 接收的数据 ] (消息对象) ==> HEADER: {"id":258,"headLength":12,"contentLength":17,"encryption":0,"subcontract":false,"phone":"272016634023","number":2349,"subcontractLength":0,"subcontractIndex":0} MESSAGE: {"authCode":"C80560CA20D34DFE","bytes":[67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0]}
+2021-04-27 09:31:03 [actuator-pool-1-thread-2] INFO  com.lidashuang.jt.actuator.Jtt808T8Actuator - [ 接收到「鉴权」] ==> {"authCode":"C80560CA20D34DFE","bytes":[67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0]}
+2021-04-27 09:31:03 [actuator-pool-1-thread-2] INFO  com.lidashuang.jt.actuator.Jtt808T8Actuator - [ 应答到「鉴权」 ] ==> {"answerNumber":2349,"answerId":0,"result":0,"bytes":null}
+2021-04-27 09:31:03 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttEncoder - [ 发送的数据 ] (消息对象) ==> HEADER: {"id":32769,"headLength":12,"contentLength":5,"encryption":0,"subcontract":false,"phone":"272016634023","number":2,"subcontractLength":0,"subcontractIndex":0} MESSAGE: {"answerNumber":2349,"answerId":0,"result":0,"bytes":[9, 45, 0, 0, 0]}
+2021-04-27 09:31:03 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttEncoder - [ 发送的数据 ] ===> [126, -128, 1, 0, 5, 39, 32, 22, 99, 64, 35, 0, 2, 9, 45, 0, 0, 0, -77, 126]

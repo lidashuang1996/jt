@@ -5,6 +5,7 @@ import com.lidashuang.jt.JttUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -82,7 +83,7 @@ public class Jtt808T5 extends JttMessage {
             outputStream.write(terminalModel);
             outputStream.write(terminalId);
             outputStream.write((byte) licensePlateColor);
-            outputStream.write(vehicleMark.getBytes("GBK"));
+            outputStream.write(vehicleMark.getBytes("UTF-8"));
             this.bytes = outputStream.toByteArray();
             return this.bytes;
         } catch (Exception e) {
@@ -108,7 +109,7 @@ public class Jtt808T5 extends JttMessage {
                     JttUtils.bytesArrayIntercept(bytes, 9, 20),
                     JttUtils.bytesArrayIntercept(bytes, 29, 7),
                     bytes[36],
-                    new String(JttUtils.bytesArrayIntercept(bytes, 37, bytes.length - 37), "GBK"),
+                    new String(JttUtils.bytesArrayIntercept(bytes, 37, bytes.length - 37), StandardCharsets.UTF_8),
                     bytes
             );
         } catch (Exception e) {

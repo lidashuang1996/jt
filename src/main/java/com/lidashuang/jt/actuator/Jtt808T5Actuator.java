@@ -21,7 +21,7 @@ public class Jtt808T5Actuator implements JttActuator {
     public void execute(JttContext context, JttMessage message) {
         LOGGER.info("[ 接收到「注册」] ==> " + message.toString());
         final Jtt808T6 jtt808T6 = new Jtt808T6(
-                message.getHeader().getNumber(), 0, JttUtils.generateUUID());
+                message.getHeader().getNumber(), 0, JttUtils.generateUuid(12));
         context.sendMessage(jtt808T6);
         LOGGER.info("[ 应答到「注册」 ] ==> " + jtt808T6);
     }

@@ -4,6 +4,7 @@ import com.lidashuang.jt.JttMessage;
 import com.lidashuang.jt.JttUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -60,7 +61,7 @@ public class Jtt808T6 extends JttMessage {
             outputStream = new ByteArrayOutputStream();
             outputStream.write(JttUtils.integerToHigh8Low8(answerNumber));
             outputStream.write((byte) result);
-            outputStream.write(authCode.getBytes("GBK"));
+            outputStream.write(authCode.getBytes("UTF-8"));
             this.bytes = outputStream.toByteArray();
             return this.bytes;
         } catch (Exception e) {
@@ -82,7 +83,7 @@ public class Jtt808T6 extends JttMessage {
             return new Jtt808T6(
                     JttUtils.bytesToHigh8Low8(JttUtils.bytesArrayIntercept(bytes, 0, 2)),
                     bytes[2],
-                    new String(JttUtils.bytesArrayIntercept(bytes, 3, bytes.length - 3), "GBK"),
+                    new String(JttUtils.bytesArrayIntercept(bytes, 3, bytes.length - 3), StandardCharsets.UTF_8),
                     bytes
             );
         } catch (Exception e) {

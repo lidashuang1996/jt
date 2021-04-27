@@ -1,6 +1,8 @@
 package com.lidashuang.jt.jtt808;
 
 import com.lidashuang.jt.JttMessage;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -44,7 +46,7 @@ public class Jtt808T8 extends JttMessage {
     @SuppressWarnings("all")
     public byte[] encode() {
         try {
-            this.bytes = authCode.getBytes("GBK");
+            this.bytes = authCode.getBytes("UTF-8");
             return this.bytes;
         } catch (Exception e) {
             throw new RuntimeException("[ Jtt808T8 ] encode() ==> " + e);
@@ -54,7 +56,7 @@ public class Jtt808T8 extends JttMessage {
     @Override
     public Jtt808T8 decode(byte[] bytes) {
         try {
-            return new Jtt808T8(new String(bytes, "GBK"), bytes);
+            return new Jtt808T8(new String(bytes, StandardCharsets.UTF_8), bytes);
         } catch (Exception e) {
             throw new RuntimeException("[ Jtt808T8 ] decode() ==> " + e);
         }

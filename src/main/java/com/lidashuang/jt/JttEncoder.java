@@ -143,12 +143,14 @@ public class JttEncoder extends MessageToByteEncoder<JttMessage> {
         if (data.length < MAX_MESSAGE_SIZE) {
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             try {
-                final byte[] headerBytes = new JttMessageHeader(
+                final JttMessageHeader h = new JttMessageHeader(
                         jttMessage.getMid(), 12, data.length,
                         header.getEncryption(), false,
                         header.getPhone(), header.getNumber(),
                         0, 0
-                ).encode();
+                );
+                final byte[] headerBytes = h.encode();
+                LOGGER.info("[ 发送的数据 ] (消息对象) ==> HEADER: " + h + " MESSAGE: " + jttMessage);
                 outputStream.write(MARK);
                 // 写入转义且写入验证码的数据
                 encodeTransferredMeaningAndWriteCheckCode(headerBytes, data, outputStream);
