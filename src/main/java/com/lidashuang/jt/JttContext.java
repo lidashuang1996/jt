@@ -83,6 +83,14 @@ public class JttContext {
     }
 
     /**
+     * 获取全部属性
+     * @return 全部属性
+     */
+    public Map<String, Object> getAttribute() {
+        return attribute;
+    }
+
+    /**
      * 删除属性
      * @param key 属性的 KEY
      */

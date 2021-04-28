@@ -2,6 +2,7 @@ package com.lidashuang.jt.actuator;
 
 import com.lidashuang.jt.JttActuator;
 import com.lidashuang.jt.JttContext;
+import com.lidashuang.jt.JttManage;
 import com.lidashuang.jt.JttMessage;
 import com.lidashuang.jt.jtt808.Jtt808T2;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class Jtt808T8Actuator implements JttActuator {
         LOGGER.info("[ 接收到「鉴权」] ==> " + message.toString());
         final Jtt808T2 jtt808T2 = new Jtt808T2(
                 message.getHeader().getNumber(), message.getMid(), 0);
+        JttManage.setContextList(context);
         context.sendMessage(jtt808T2);
         LOGGER.info("[ 应答到「鉴权」 ] ==> " + jtt808T2);
     }

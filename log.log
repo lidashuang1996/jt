@@ -1,12 +1,11 @@
-[ 接收的数据 ] ===> [126, 1, 2, 0, 17, 39, 32, 22, 99, 64, 35, 9, 44, 67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0, 90, 126]
-2021-04-27 09:30:48 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttDecoder - [ 接收的数据 ] (消息对象) ==> HEADER: {"id":258,"headLength":12,"contentLength":17,"encryption":0,"subcontract":false,"phone":"272016634023","number":2348,"subcontractLength":0,"subcontractIndex":0} MESSAGE: {"authCode":"C80560CA20D34DFE","bytes":[67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0]}
-2021-04-27 09:30:48 [actuator-pool-1-thread-1] INFO  com.lidashuang.jt.actuator.Jtt808T8Actuator - [ 接收到「鉴权」] ==> {"authCode":"C80560CA20D34DFE","bytes":[67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0]}
-2021-04-27 09:30:48 [actuator-pool-1-thread-1] INFO  com.lidashuang.jt.actuator.Jtt808T8Actuator - [ 应答到「鉴权」 ] ==> {"answerNumber":2348,"answerId":0,"result":0,"bytes":null}
-2021-04-27 09:30:48 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttEncoder - [ 发送的数据 ] (消息对象) ==> HEADER: {"id":32769,"headLength":12,"contentLength":5,"encryption":0,"subcontract":false,"phone":"272016634023","number":1,"subcontractLength":0,"subcontractIndex":0} MESSAGE: {"answerNumber":2348,"answerId":0,"result":0,"bytes":[9, 44, 0, 0, 0]}
-2021-04-27 09:30:48 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttEncoder - [ 发送的数据 ] ===> [126, -128, 1, 0, 5, 39, 32, 22, 99, 64, 35, 0, 1, 9, 44, 0, 0, 0, -79, 126]
-2021-04-27 09:31:03 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttDecoder - [ 接收的数据 ] ===> [126, 1, 2, 0, 17, 39, 32, 22, 99, 64, 35, 9, 45, 67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0, 91, 126]
-2021-04-27 09:31:03 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttDecoder - [ 接收的数据 ] (消息对象) ==> HEADER: {"id":258,"headLength":12,"contentLength":17,"encryption":0,"subcontract":false,"phone":"272016634023","number":2349,"subcontractLength":0,"subcontractIndex":0} MESSAGE: {"authCode":"C80560CA20D34DFE","bytes":[67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0]}
-2021-04-27 09:31:03 [actuator-pool-1-thread-2] INFO  com.lidashuang.jt.actuator.Jtt808T8Actuator - [ 接收到「鉴权」] ==> {"authCode":"C80560CA20D34DFE","bytes":[67, 56, 48, 53, 54, 48, 67, 65, 50, 48, 68, 51, 52, 68, 70, 69, 0]}
-2021-04-27 09:31:03 [actuator-pool-1-thread-2] INFO  com.lidashuang.jt.actuator.Jtt808T8Actuator - [ 应答到「鉴权」 ] ==> {"answerNumber":2349,"answerId":0,"result":0,"bytes":null}
-2021-04-27 09:31:03 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttEncoder - [ 发送的数据 ] (消息对象) ==> HEADER: {"id":32769,"headLength":12,"contentLength":5,"encryption":0,"subcontract":false,"phone":"272016634023","number":2,"subcontractLength":0,"subcontractIndex":0} MESSAGE: {"answerNumber":2349,"answerId":0,"result":0,"bytes":[9, 45, 0, 0, 0]}
-2021-04-27 09:31:03 [nioEventLoopGroup-3-1] INFO  com.lidashuang.jt.JttEncoder - [ 发送的数据 ] ===> [126, -128, 1, 0, 5, 39, 32, 22, 99, 64, 35, 0, 2, 9, 45, 0, 0, 0, -77, 126]
+"alarmMark":[0, 4, 0, 4],"status":[0, 4, 0, 1],"latitude":22564252,"longitude":113861908,"height":2,"speed":0,"direction":0,"datetime":"210427220323",
+
+# 04 04
+# 00000000 00001000 00000000 00001000
+
+
+"extend":[1, 4, 0, 0, 4, 67, 49, 1, 0],
+
+
+
+"bytes":[0, 4, 0, 4, 0, 4, 0, 1, 1, 88, 77, -100, 6, -55, 101, 20, 0, 2, 0, 0, 0, 0, 33, 4, 39, 34, 3, 35, 1, 4, 0, 0, 4, 67, 49, 1, 0]}
