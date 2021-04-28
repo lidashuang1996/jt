@@ -229,11 +229,11 @@ public class JttDecoder extends ByteToMessageDecoder {
         // * 则经过封装如下：0x7e 0x30 0x7d 0x02 0x08 0x7d 0x01 0x55 0x7e
 
         // 开始的长度
-        final int sLen = 1;
+        final int mLen = 1;
         // 结尾的长度
-        final int eLen = 2;
+        final int vLen = 1;
         // 单条消息的最小长度 1 标记 + 12 消息头<12/16> + 1 校验 + 1 标记
-        final int minLen = sLen + 12 + eLen;
+        final int minLen = mLen + 12 + vLen + mLen;
 
         // 最短长度校验
         if (bytes.length < minLen) {
@@ -244,15 +244,15 @@ public class JttDecoder extends ByteToMessageDecoder {
         // 索引
         int index = 0;
         // 校验码
-        int checkCode = bytes[sLen];
+        int checkCode = bytes[mLen];
         // 校验的状态
         boolean checkStatus;
         // 数据源
-        byte[] data = new byte[bytes.length - sLen - eLen];
+        byte[] data = new byte[bytes.length - mLen - mLen];
         // 转义还原 且 计算校验码
-        for (int i = sLen; i < bytes.length - eLen; i++) {
+        for (int i = mLen; i < bytes.length - 1; i++) {
             // 转义还原
-            if (bytes[i] == MARK_T && i + 1 < bytes.length - eLen) {
+            if (bytes[i] == MARK_T && i + 1 < bytes.length - 1) {
                 if (bytes[i + 1] == MARK_T_B1) {
                     data[index++] = MARK;
                     i++;
@@ -265,17 +265,15 @@ public class JttDecoder extends ByteToMessageDecoder {
             } else {
                 data[index++] = bytes[i];
             }
-            // 计算校验码
-            if (i != sLen) {
+            // 计算验证码
+            if (i != mLen && i != bytes.length - 2) {
                 checkCode ^= data[index - 1];
             }
         }
-        // 压缩数组
-        if (index != bytes.length - sLen - eLen) {
-            data = Arrays.copyOf(data, index);
-        }
         // 校验码验证
-        checkStatus = (checkCode == bytes[bytes.length - eLen]);
+        checkStatus = (checkCode == data[index - 1]);
+        // 压缩数组
+        data = Arrays.copyOf(data, index - 1);
         // 校验码是否正确
         if (checkStatus) {
             // 解析头部字节码内容
