@@ -28,7 +28,7 @@
         <!--文件滚动模式-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志文件输出的文件名,可设置文件类型为gz,开启文件压缩-->
-            <FileNamePattern>${LOG_HOME}/club_source_service/log_%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${LOG_HOME}/log_%d{yyyy-MM-dd}.log</FileNamePattern>
         </rollingPolicy>
         <!--输出格式-->
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">

@@ -1,6 +1,5 @@
 server:
-  port: 9888
-
+  port: 11000
 
 # 日志的配置文件
 logging:
